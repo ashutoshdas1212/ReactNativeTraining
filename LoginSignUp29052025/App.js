@@ -51,8 +51,17 @@
       
 //         )
 //         }
+
+
+
+
+
+
+
+
+
 import * as React from 'react';
-import {View, Text} from 'react-native';
+import {View, Text,Image} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -63,19 +72,11 @@ import SignUp from './src/SignUp';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-function MyTabs() {
-  return (
-    <Tab.Navigator>
-      <Tab.Screen name="Home" component={Home} />
-      <Tab.Screen name="Login" component={Login} />
-    </Tab.Navigator>
-  );
-}
 
-export default function App() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
+function HomeStack()
+{
+  return(
+ <Stack.Navigator initialRouteName="Home">
         <Stack.Screen
           name="Home"
           component={Home}
@@ -94,7 +95,31 @@ export default function App() {
         <Stack.Screen name="Login" component={Login} options={{headerShown:false}} />
         <Stack.Screen name="SignUp" component={SignUp} options={{headerShown:false}} />
         
+
+
       </Stack.Navigator>
+  );
+}
+export default function App() {
+  return (
+    <NavigationContainer>
+     <Tab.Navigator>
+      <Tab.Screen name="HomeStack" component={HomeStack} options={{headerShown:false,title:'Home',tabBarIcon:({size,color})=>{
+        return(
+          <Image style={{width:size,height:size}} source={require('./images/Home.png')} />
+        )
+      }}}></Tab.Screen>
+       <Tab.Screen name="Login" component={Login} options={{headerShown:false,tabBarIcon:({size,color})=>{
+        return(
+          <Image style={{width:size,height:size}} source={require('./images/Login.png')} />
+        )
+      }}} />
+        <Tab.Screen name="SignUp" component={SignUp} options={{headerShown:false,tabBarIcon:({size,color})=>{
+        return(
+          <Image style={{width:size,height:size}} source={require('./images/SignUp.png')} />
+        )
+      }}} />
+     </Tab.Navigator>
       
     </NavigationContainer>
   );

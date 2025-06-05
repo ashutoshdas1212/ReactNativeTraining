@@ -411,7 +411,7 @@ const Home = (props) => {
             contentContainerStyle={styles.listContent}
             style={styles.productsList}
             ListHeaderComponent={
-              <Text style={styles.sectionTitle}>Featured Products ({products.length})</Text>
+              <Text style={styles.sectionTitle}>Featured Products </Text>
             }
             refreshControl={
               <RefreshControl
@@ -443,11 +443,11 @@ const Home = (props) => {
                 </View>
               </View>
             )}
-            ListFooterComponent={
-              <View style={styles.footer}>
-                <Text style={styles.footerText}>Showing {products.length} products</Text>
-              </View>
-            }
+            // ListFooterComponent={
+            //   <View style={styles.footer}>
+            //     <Text style={styles.footerText}>Showing {products.length} products</Text>
+            //   </View>
+            // }
           />
         )}
       </View>
