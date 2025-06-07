@@ -69,6 +69,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Home from './src/Home';
 import Login from './src/Login';
 import SignUp from './src/SignUp';
+import Profile from './src/Profile';
+import Details from './src/Details';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -103,23 +105,24 @@ function HomeStack()
 export default function App() {
   return (
     <NavigationContainer>
-     <Tab.Navigator>
+     <Tab.Navigator screenOptions={{tabBarStyle:90}}>
       <Tab.Screen name="HomeStack" component={HomeStack} options={{headerShown:false,title:'Home',tabBarIcon:({size,color})=>{
         return(
-          <Image style={{width:size,height:size}} source={require('./images/Home.png')} />
+          <Image style={{width:size,height:size,tintColor:color}} source={require('./images/Home.png')} />
         )
       }}}></Tab.Screen>
-       <Tab.Screen name="Login" component={Login} options={{headerShown:false,tabBarIcon:({size,color})=>{
+       <Tab.Screen name="Profile" component={Profile} options={{headerShown:false,tabBarIcon:({size})=>{
         return(
-          <Image style={{width:size,height:size}} source={require('./images/Login.png')} />
+          <Image style={{width:size,height:size}} source={require('./images/Profile.jpg')} />
         )
       }}} />
-        <Tab.Screen name="SignUp" component={SignUp} options={{headerShown:false,tabBarIcon:({size,color})=>{
+        <Tab.Screen name="Details" component={Details} options={{headerShown:false,tabBarIcon:({size,color})=>{
         return(
-          <Image style={{width:size,height:size}} source={require('./images/SignUp.png')} />
+          <Image style={{width:size,height:size,tintColor:color}} source={require('./images/Details.png')} />
         )
       }}} />
      </Tab.Navigator>
+
       
     </NavigationContainer>
   );

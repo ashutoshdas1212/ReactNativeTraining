@@ -370,7 +370,7 @@ const Home = (props) => {
   return (
     <Background>
       <View style={styles.container}>
-        {/* Header Section */}
+      
         <View style={styles.header}>
           <Text style={styles.welcomeText}>Welcome {email}</Text>
           <View style={styles.buttonsContainer}>
@@ -391,7 +391,7 @@ const Home = (props) => {
           </View>
         </View>
 
-        {/* Products List */}
+      
         {error ? (
           <View style={styles.errorContainer}>
             <Text style={styles.errorText}>Error: {error}</Text>
@@ -443,11 +443,11 @@ const Home = (props) => {
                 </View>
               </View>
             )}
-            // ListFooterComponent={
-            //   <View style={styles.footer}>
-            //     <Text style={styles.footerText}>Showing {products.length} products</Text>
-            //   </View>
-            // }
+            ListFooterComponent={
+              <View style={styles.footer}>
+                <Text style={styles.footerText}>Showing products</Text>
+              </View>
+            }
           />
         )}
       </View>
