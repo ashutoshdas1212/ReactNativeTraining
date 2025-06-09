@@ -61,7 +61,7 @@
 
 
 import * as React from 'react';
-import {View, Text,Image} from 'react-native';
+import {View, Text,Image, StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -104,6 +104,7 @@ function HomeStack()
 }
 export default function App() {
   return (
+    <View style={styles.container}> 
     <NavigationContainer>
      <Tab.Navigator screenOptions={{tabBarStyle:90}}>
       <Tab.Screen name="HomeStack" component={HomeStack} options={{headerShown:false,title:'Home',tabBarIcon:({size,color})=>{
@@ -111,12 +112,12 @@ export default function App() {
           <Image style={{width:size,height:size,tintColor:color}} source={require('./images/Home.png')} />
         )
       }}}></Tab.Screen>
-       <Tab.Screen name="Profile" component={Profile} options={{headerShown:false,tabBarIcon:({size})=>{
+       <Tab.Screen name="Profile" component={Profile} options={{tabBarIcon:({size})=>{
         return(
           <Image style={{width:size,height:size}} source={require('./images/Profile.jpg')} />
         )
       }}} />
-        <Tab.Screen name="Details" component={Details} options={{headerShown:false,tabBarIcon:({size,color})=>{
+        <Tab.Screen name="Details" component={Details} options={{tabBarIcon:({size,color})=>{
         return(
           <Image style={{width:size,height:size,tintColor:color}} source={require('./images/Details.png')} />
         )
@@ -125,5 +126,17 @@ export default function App() {
 
       
     </NavigationContainer>
+    </View>
   );
 }
+
+
+const styles = StyleSheet.create({
+
+  container:{
+    flex:1,
+   
+  }
+
+  })
+  
