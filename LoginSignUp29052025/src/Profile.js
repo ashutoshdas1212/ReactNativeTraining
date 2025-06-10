@@ -1,9 +1,12 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import ProfileHeader from './components/ProfileHeader.js'
-import { iconSize, spacing } from '../constants/dimensions.js'
+import { fontSize, iconSize, spacing } from '../constants/dimensions.js'
 import { colors } from './Constants.js'
 import Feather from "react-native-vector-icons/Feather"
+import { fontFamily } from '../constants/fontFamily.js'
+import CustomInput from './components/CustomInput.js'
+
 
 const Profile = () => {
   return (
@@ -20,8 +23,16 @@ const Profile = () => {
 
       {/* PROFILE DETAILS CONTAINER**/}
       <View style={styles.nameRoleContainer}>
-      <Text></Text>
+      <Text style={styles.name}>Samazon</Text>
       </View>
+
+{/*input field container*/}
+<View style={styles.inputFieldsContainer}>
+{/* add all the input fields */}
+<CustomInput/>
+</View>
+
+
       <Text>Profile</Text>
     </View>
   )
@@ -54,6 +65,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop:-30,
     marginLeft:45
+  },
+  nameRoleContainer:{
+    alignItems:"center",
+    marginVertical:spacing.sm
+  } ,
+  name:{
+    fontFamily:fontFamily.semiBold, 
+    fontSize:fontSize.lg,
+    color:colors.textPrimary
   }
 });
 
