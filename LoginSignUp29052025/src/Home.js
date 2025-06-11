@@ -73,7 +73,7 @@ const Home = (props) => {
       
         <View style={styles.header}>
           <Text style={styles.welcomeText}>Welcome {email}</Text>
-          <View style={styles.buttonsContainer}>
+          {/* <View style={styles.buttonsContainer}>
             <Btn
               bgColor={darkGreen}
               textColor="white"
@@ -88,7 +88,7 @@ const Home = (props) => {
               Press={() => navigation.navigate('SignUp')}
               style={styles.authButton}
             />
-          </View>
+          </View> */}
         </View>
 
       
