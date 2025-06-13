@@ -1,332 +1,213 @@
 
-// import React,{useState} from 'react';
-// import {fontFamily} from '../../constants/fontFamily';
-// import {fontSize, iconSize, spacing} from '../../constants/dimensions';
 
+// import React, { useState } from 'react';
+// import { View, Text, TextInput, TouchableOpacity, Modal, StyleSheet } from 'react-native';
 // import Ionicons from 'react-native-vector-icons/Ionicons';
-// import {colors} from '../Constants';
+// import { colors } from '../Constants';
+// import { iconSize } from '../../constants/dimensions';
 
-// import {
-//   View, Text, TextInput, TouchableOpacity, Modal,
-//   StyleSheet, Alert, ScrollView, SafeAreaView
-// } from 'react-native';
+// const CustomInput = ({ isEditable, formData, onFieldChange }) => {
+//   const [showGenderModal, setShowGenderModal] = useState(false);
+//   const [tempGender, setTempGender] = useState('');
+//   const [errors, setErrors] = useState({});
 
-// // type CustomInputProps = {
-// //   label: string,
-// //   icon?: React.FC,
-// //   placeholder: string,
-// // };
-// const CustomInput= () => {
-//     const [firstName, setFirstName] = useState('');
-//     const [lastName, setLastName] = useState('');
-//     const [gender, setGender] = useState('');
-//     const [showGenderModal, setShowGenderModal] = useState(false);
-//     const [tempGender, setTempGender] = useState('');
-//     const [email, setEmail] = useState('');
-//     const [password, setPassword] = useState('');
-//     const [mobile, setMobile] = useState('');
+//   const validateField = (field, value) => {
+//     let error = '';
    
-//     const [firstNameError, setFirstNameError] = useState('');
-//     const [lastNameError, setLastNameError] = useState('');
-//     const [genderError, setGenderError] = useState('');
-//     const [emailError, setEmailError] = useState('');
-//     const [passwordError, setPasswordError] = useState('');
-//     const [mobileError, setMobileError] = useState('');
+//     switch(field) {
+//       case 'firstName':
+//         if (!value) error = 'First name is required';
+//         else if (!/^[A-Za-z\s]+$/.test(value)) error = 'First name should contain only letters';
+//         break;
+//       case 'lastName':
+//         if (value && !/^[A-Za-z\s]+$/.test(value)) error = 'Last name should contain only letters';
+//         break;
+//       case 'email':
+//         if (!value) error = 'Email is required';
+//         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = 'Enter a valid email address';
+//         break;
+//       case 'password':
+//         if (value && value.length < 8) error = 'Password must be at least 8 characters';
+//         else if (value && !/[A-Z]/.test(value)) error = 'Password must contain at least one uppercase letter';
+//         else if (value && !/[0-9]/.test(value)) error = 'Password must contain at least one number';
+//         else if (value && !/[^A-Za-z0-9]/.test(value)) error = 'Password must contain at least one special character';
+//         break;
+//       case 'mobile':
+//         if (value && (value.length !== 10 || isNaN(Number(value)))) error = 'Enter a valid 10-digit mobile number';
+//         break;
+//     }
    
-//     const validateForm = () => {
-//       let isValid = true;
+//     setErrors({
+//       ...errors,
+//       [field]: error
+//     });
    
-//       setFirstNameError('');
-//       setLastNameError('');
-//       setGenderError('');
-//       setEmailError('');
-//       setPasswordError('');
-//       setMobileError('');
-   
-//       if (!firstName) {
-//         setFirstNameError('First name is required to be filled');
-//         isValid = false;
-//       } else if (!/^[A-Za-z\s]+$/.test(firstName)) {
-//         setFirstNameError('First name should contain only letters');
-//         isValid = false;
-//       }
-   
-//       if (!lastName) {
-//         setLastNameError('Last name is required to be filled');
-//         isValid = false;
-//       } else if (!/^[A-Za-z\s]+$/.test(lastName)) {
-//         setLastNameError('Last name should contain only letters');
-//         isValid = false;
-//       }
-   
-//       if (!gender) {
-//         setGenderError('Gender is required to be selected');
-//         isValid = false;
-//       }
-   
-//       if (!email) {
-//         setEmailError('Email is required to be filled');
-//         isValid = false;
-//       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-//         setEmailError('Enter a valid email address');
-//         isValid = false;
-//       }
-   
-//       if (!password) {
-//         setPasswordError('Password is required');
-//         isValid = false;
-//       } else if (password.length < 8) {
-//         setPasswordError('Password must be at least 8 characters');
-//         isValid = false;
-//       } else if (!/[A-Z]/.test(password)) {
-//         setPasswordError('Password must contain at least one uppercase letter');
-//         isValid = false;
-//       } else if (!/[0-9]/.test(password)) {
-//         setPasswordError('Password must contain at least one number');
-//         isValid = false;
-//       } else if (!/[^A-Za-z0-9]/.test(password)) {
-//         setPasswordError('Password must contain at least one special character');
-//         isValid = false;
-//       }
-   
-//       if (!mobile) {
-//         setMobileError('Mobile number is required to be filled');
-//         isValid = false;
-//       } else if (mobile.length !== 10 || isNaN(Number(mobile))) {
-//         setMobileError('Enter a valid 10-digit mobile number');
-//         isValid = false;
-//       }
-   
-//       return isValid;
-//     };
-  
-  
-   
-//     const handleRegister = () => {
-//       if (validateForm()) {
-//         Alert.alert('Success', 'Registration Successful');
-//       }
-//     };
-   
-//     const renderGenderModal = () => (
-//       <Modal transparent visible={showGenderModal} animationType="slide">
-//         <View style={styles.modalContainer}>
-//           <View style={styles.bottomSheet}>
-//             <Text style={styles.modalTitle}>Select Gender</Text>
-//             {['Male', 'Female', 'Non-binary', 'Prefer not to say'].map((option) => (
-//               <TouchableOpacity
-//                 key={option}
-//                 onPress={() => setTempGender(option)}
+//     return !error;
+//   };
+
+//   const handleChange = (field, value) => {
+//     onFieldChange(field, value);
+//     validateField(field, value);
+//   };
+
+//   const renderGenderModal = () => (
+//     <Modal transparent visible={showGenderModal} animationType="slide">
+//       <View style={styles.modalContainer}>
+//         <View style={styles.bottomSheet}>
+//           <Text style={styles.modalTitle}>Select Gender</Text>
+//           {['Male', 'Female', 'Non-binary', 'Prefer not to say'].map((option) => (
+//             <TouchableOpacity
+//               key={option}
+//               onPress={() => setTempGender(option)}
+//               style={[
+//                 styles.modalOptionBox,
+//                 tempGender === option && styles.selectedOptionBox
+//               ]}
+//             >
+//               <Text
 //                 style={[
-//                   styles.modalOptionBox,
-//                   tempGender === option && styles.selectedOptionBox
+//                   styles.modalOption,
+//                   tempGender === option && styles.selectedOptionText
 //                 ]}
 //               >
-//                 <Text
-//                   style={[
-//                     styles.modalOption,
-//                     tempGender === option && styles.selectedOptionText
-//                   ]}
-//                 >
-//                   {option}
-//                 </Text>
-//               </TouchableOpacity>
-//             ))}
-   
-//             <View style={styles.modalButtons}>
-//               <TouchableOpacity
-//                 onPress={() => {
-//                   setGender(tempGender);
-//                   setShowGenderModal(false);
-//                   setGenderError('');
-//                 }}
-//                 style={styles.confirmButton}
-//               >
-//                 <Text style={[styles.buttonText, { color: 'white' }]}>Confirm</Text>
-//               </TouchableOpacity>
-//               <TouchableOpacity
-//                 onPress={() => setShowGenderModal(false)}
-//                 style={styles.cancelButton}
-//               >
-//                 <Text style={[styles.buttonText, { color: 'black' }]}>Cancel</Text>
-//               </TouchableOpacity>
-//             </View>
+//                 {option}
+//               </Text>
+//             </TouchableOpacity>
+//           ))}
+//           <View style={styles.modalButtons}>
+//             <TouchableOpacity
+//               onPress={() => {
+//                 handleChange('gender', tempGender);
+//                 setShowGenderModal(false);
+//               }}
+//               style={styles.confirmButton}
+//             >
+//               <Text style={[styles.buttonText, { color: 'white' }]}>Confirm</Text>
+//             </TouchableOpacity>
+//             <TouchableOpacity
+//               onPress={() => setShowGenderModal(false)}
+//               style={styles.cancelButton}
+//             >
+//               <Text style={[styles.buttonText, { color: 'black' }]}>Cancel</Text>
+//             </TouchableOpacity>
 //           </View>
 //         </View>
-//       </Modal>
-//     );
-//   return (
-//     // <View style={styles.container}>
-//     //   <Text style={styles.inputLabel}>Your Email</Text>
-//     //   <View style={styles.inputFieldContainer}>
-//     //     <TextInput />
-//     //     <Ionicons
-//     //       name={'mail-outline'}
-//     //       size={iconSize.md}
-//     //       color={colors.iconSecondary}
-//     //       style={styles.icon}
-//     //     />
-//     //     <TextInput
-//     //       style={styles.textInput}
-//     //       placeholder="Enter your email Id"
-//     //       placeholderTextColor={colors.iconSecondary}
-//     //     />
-//     //   </View>
-//     // </View>
-//      <SafeAreaView>
-//           <ScrollView contentContainerStyle={styles.container}>
-//             <View style={styles.inputGroup}>
-//               <Text style={styles.label}>First Name</Text>
-//               <TextInput
-//                 style={[styles.input, firstNameError ? styles.inputError : null]}
-//                 value={firstName}
-//                 onChangeText={(text) => {
-//                   setFirstName(text);
-//                   setFirstNameError('');
-//                 }}
-//               />
-//               {firstNameError ? <Text style={styles.errorText}>{firstNameError}</Text> : null}
-//             </View>
-     
-//             <View style={styles.inputGroup}>
-//               <Text style={styles.label}>Last Name</Text>
-//               <TextInput
-//                 style={[styles.input, lastNameError ? styles.inputError : null]}
-//                 value={lastName}
-//                 onChangeText={(text) => {
-//                   setLastName(text);
-//                   setLastNameError('');
-//                 }}
-//               />
-//               {lastNameError ? <Text style={styles.errorText}>{lastNameError}</Text> : null}
-//             </View>
-     
-//             <View style={styles.inputGroup}>
-//               <Text style={styles.label}>Gender</Text>
-//               <TouchableOpacity
-//                 onPress={() => {
-//                   setShowGenderModal(true);
-//                   setGenderError('');
-//                 }}
-//                 style={[styles.input, genderError ? styles.inputError : null]}
-//               >
-//                 <Text style={{ color: gender ? 'black' : '#aaa', fontSize: 16 }}>
-//                   {gender || 'Select Gender'}
-//                 </Text>
-//               </TouchableOpacity>
-//               {genderError ? <Text style={styles.errorText}>{genderError}</Text> : null}
-//             </View>
-     
-//             {renderGenderModal()}
-     
-//             <View style={styles.inputGroup}>
-//               <Text style={styles.label}>Email ID</Text>
-//               <TextInput
-//                 style={[styles.input, emailError ? styles.inputError : null]}
-//                 value={email}
-//                 onChangeText={(text) => {
-//                   setEmail(text);
-//                   setEmailError('');
-//                 }}
-//                 keyboardType="email-address"
-//                 autoCapitalize="none"
-//               />
-//               {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-//             </View>
-     
-//             <View style={styles.inputGroup}>
-//               <Text style={styles.label}>Password</Text>
-//               <TextInput
-//                 style={[styles.input, passwordError ? styles.inputError : null]}
-//                 value={password}
-//                 onChangeText={(text) => {
-//                   setPassword(text);
-//                   setPasswordError('');
-//                 }}
-//                 secureTextEntry={true}
-//                 placeholder="At least 8 characters with uppercase, number & special char"
-//               />
-//               {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
-//             </View>
-     
-//             <View style={styles.inputGroup}>
-//               <Text style={styles.label}>Mobile Number</Text>
-//               <TextInput
-//                 style={[styles.input, mobileError ? styles.inputError : null]}
-//                 keyboardType="numeric"
-//                 value={mobile}
-//                 onChangeText={(text) => {
-//                   setMobile(text);
-//                   setMobileError('');
-//                 }}
-//                 maxLength={10}
-//               />
-//               {mobileError ? <Text style={styles.errorText}>{mobileError}</Text> : null}
-//             </View>
-     
-//             <TouchableOpacity onPress={handleRegister} style={styles.registerButton}>
-//               <Text style={styles.registerText}>Save Changes</Text>
-//             </TouchableOpacity>
-            
-//           </ScrollView>
-//         </SafeAreaView>
+//       </View>
+//     </Modal>
+//   );
 
+//   return (
+//     <View>
+//       <View style={styles.inputGroup}>
+//         <Text style={styles.label}>First Name</Text>
+//         {isEditable ? (
+//           <TextInput
+//             style={[styles.input, errors.firstName && styles.inputError]}
+//             value={formData.firstName}
+//             onChangeText={(text) => handleChange('firstName', text)}
+//           />
+//         ) : (
+//           <Text style={styles.displayText}>{formData.firstName}</Text>
+//         )}
+//         {errors.firstName && <Text style={styles.errorText}>{errors.firstName}</Text>}
+//       </View>
+
+//       <View style={styles.inputGroup}>
+//         <Text style={styles.label}>Last Name</Text>
+//         {isEditable ? (
+//           <TextInput
+//             style={[styles.input, errors.lastName && styles.inputError]}
+//             value={formData.lastName}
+//             onChangeText={(text) => handleChange('lastName', text)}
+//           />
+//         ) : (
+//           <Text style={styles.displayText}>{formData.lastName || 'Not provided'}</Text>
+//         )}
+//         {errors.lastName && <Text style={styles.errorText}>{errors.lastName}</Text>}
+//       </View>
+
+//       <View style={styles.inputGroup}>
+//         <Text style={styles.label}>Gender</Text>
+//         {isEditable ? (
+//           <>
+//             <TouchableOpacity
+//               onPress={() => {
+//                 setTempGender(formData.gender);
+//                 setShowGenderModal(true);
+//               }}
+//               style={[styles.input, errors.gender && styles.inputError]}
+//             >
+//               <Text style={{ color: formData.gender ? 'black' : '#aaa', fontSize: 16 }}>
+//                 {formData.gender || 'Select Gender'}
+//               </Text>
+//             </TouchableOpacity>
+//             {renderGenderModal()}
+//           </>
+//         ) : (
+//           <Text style={styles.displayText}>{formData.gender || 'Not provided'}</Text>
+//         )}
+//         {errors.gender && <Text style={styles.errorText}>{errors.gender}</Text>}
+//       </View>
+
+//       <View style={styles.inputGroup}>
+//         <Text style={styles.label}>Email ID</Text>
+//         {isEditable ? (
+//           <TextInput
+//             style={[styles.input, errors.email && styles.inputError]}
+//             value={formData.email}
+//             onChangeText={(text) => handleChange('email', text)}
+//             keyboardType="email-address"
+//             autoCapitalize="none"
+//           />
+//         ) : (
+//           <Text style={styles.displayText}>{formData.email}</Text>
+//         )}
+//         {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+//       </View>
+
+//       <View style={styles.inputGroup}>
+//         <Text style={styles.label}>Password</Text>
+//         {isEditable ? (
+//           <TextInput
+//             style={[styles.input, errors.password && styles.inputError]}
+//             value={formData.password}
+//             onChangeText={(text) => handleChange('password', text)}
+//             secureTextEntry={true}
+//             placeholder="At least 8 characters with uppercase, number & special char"
+//           />
+//         ) : (
+//           <Text style={styles.displayText}>••••••••</Text>
+//         )}
+//         {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+//       </View>
+
+//       <View style={styles.inputGroup}>
+//         <Text style={styles.label}>Mobile Number</Text>
+//         {isEditable ? (
+//           <TextInput
+//             style={[styles.input, errors.mobile && styles.inputError]}
+//             keyboardType="numeric"
+//             value={formData.mobile}
+//             onChangeText={(text) => handleChange('mobile', text)}
+//             maxLength={10}
+//           />
+//         ) : (
+//           <Text style={styles.displayText}>{formData.mobile || 'Not provided'}</Text>
+//         )}
+//         {errors.mobile && <Text style={styles.errorText}>{errors.mobile}</Text>}
+//       </View>
+//     </View>
 //   );
 // };
 
-// export default CustomInput;
-
-// // const styles = StyleSheet.create({
-// //   container: {
-// //     marginVertical: spacing.sm,
-// //   },
-// //   inputLabel: {
-// //     fontFamily: fontFamily.semiBold,
-// //     fontSize: fontSize.md,
-// //     color: colors.textPrimary,
-// //     marginVertical: spacing.sm,
-// //   },
-// //   inputFieldContainer: {
-// //     borderWidth: 1,
-// //     borderColor: '#F1ECEC',
-// //     borderRadius: 12,
-// //     flexDirection: 'row',
-// //     alignItems: 'center',
-// //     padding: spacing.sm,
-// //   },
-// //   icon: {
-// //     // marginHorizontal:spacing.sm
-// //   },
-// //   textInput: {
-// //     flex: 1,
-// //     fontFamily: fontFamily.medium,
-// //     fontSize: fontSize.md,
-// //   },
-// //   inputFieldsContainer: {
-// //     marginVertical: spacing.md,
-// //   },
-// // });
-
 // const styles = StyleSheet.create({
-//   container: {
-//     padding: 20,
-//     backgroundColor: '#fff',
-//     flexGrow: 1,
-//     marginTop: 70
-//   },
-//   heading: {
-//     fontSize: 24,
-//     fontWeight: 'bold',
-//     marginBottom: 25,
-//     alignSelf: 'center'
-//   },
 //   inputGroup: {
 //     marginBottom: 15
 //   },
 //   label: {
 //     fontSize: 16,
-//     marginBottom: 5,
-//     color: '#000'
+//     color: '#000',
+//     marginBottom: 5
 //   },
 //   input: {
 //     borderWidth: 1,
@@ -336,7 +217,13 @@
 //     fontSize: 16,
 //     width: '100%',
 //     alignSelf: 'stretch',
-//     backgroundColor: '#fff'
+//     backgroundColor: '#fff',
+//     marginTop: 5
+//   },
+//   displayText: {
+//     fontSize: 16,
+//     padding: 10,
+//     color: '#000'
 //   },
 //   inputError: {
 //     borderColor: 'red'
@@ -401,126 +288,64 @@
 //   },
 //   buttonText: {
 //     fontWeight: 'bold'
-//   },
-//   registerButton: {
-//     backgroundColor: '#007bff',
-//     padding: 15,
-//     borderRadius: 10,
-//     alignItems: 'center',
-//     marginTop: 50  
-//   },
-//   registerText: {
-//     color: '#fff',
-//     fontSize: 16,
-//     fontWeight: 'bold'
 //   }
 // });
 
+// export default CustomInput;
+
 import React, { useState } from 'react';
-import { fontFamily } from '../../constants/fontFamily';
-import { fontSize, iconSize, spacing } from '../../constants/dimensions';
+import { View, Text, TextInput, TouchableOpacity, Modal, StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colors } from '../Constants';
-import {
-  View, Text, TextInput, TouchableOpacity, Modal,
-  StyleSheet, Alert, ScrollView, SafeAreaView
-} from 'react-native';
+import { iconSize } from '../../constants/dimensions';
 
-const CustomInput = ({ isEditable, onEditPress, onSave }) => {
-  const [firstName, setFirstName] = useState('Samazon');
-  const [lastName, setLastName] = useState('');
-  const [gender, setGender] = useState('');
+const CustomInput = ({ isEditable, formData, onFieldChange }) => {
   const [showGenderModal, setShowGenderModal] = useState(false);
   const [tempGender, setTempGender] = useState('');
-  const [email, setEmail] = useState('samazon@example.com');
-  const [password, setPassword] = useState('');
-  const [mobile, setMobile] = useState('');
+  const [errors, setErrors] = useState({});
   const [editingField, setEditingField] = useState(null);
 
-  const [firstNameError, setFirstNameError] = useState('');
-  const [lastNameError, setLastNameError] = useState('');
-  const [genderError, setGenderError] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [mobileError, setMobileError] = useState('');
-
-  const validateForm = () => {
-    let isValid = true;
-
-    setFirstNameError('');
-    setLastNameError('');
-    setGenderError('');
-    setEmailError('');
-    setPasswordError('');
-    setMobileError('');
-
-    if (editingField === 'firstName' && !firstName) {
-      setFirstNameError('First name is required to be filled');
-      isValid = false;
-    } else if (editingField === 'firstName' && !/^[A-Za-z\s]+$/.test(firstName)) {
-      setFirstNameError('First name should contain only letters');
-      isValid = false;
+  const validateField = (field, value) => {
+    let error = '';
+   
+    switch(field) {
+      case 'firstName':
+        if (!value) error = 'First name is required';
+        else if (!/^[A-Za-z\s]+$/.test(value)) error = 'First name should contain only letters';
+        break;
+      case 'lastName':
+        if (value && !/^[A-Za-z\s]+$/.test(value)) error = 'Last name should contain only letters';
+        break;
+      case 'email':
+        if (!value) error = 'Email is required';
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = 'Enter a valid email address';
+        break;
+      case 'password':
+        if (value && value.length < 8) error = 'Password must be at least 8 characters';
+        else if (value && !/[A-Z]/.test(value)) error = 'Password must contain at least one uppercase letter';
+        else if (value && !/[0-9]/.test(value)) error = 'Password must contain at least one number';
+        else if (value && !/[^A-Za-z0-9]/.test(value)) error = 'Password must contain at least one special character';
+        break;
+      case 'mobile':
+        if (value && (value.length !== 10 || isNaN(Number(value)))) error = 'Enter a valid 10-digit mobile number';
+        break;
     }
-
-    if (editingField === 'lastName' && !lastName) {
-      setLastNameError('Last name is required to be filled');
-      isValid = false;
-    } else if (editingField === 'lastName' && !/^[A-Za-z\s]+$/.test(lastName)) {
-      setLastNameError('Last name should contain only letters');
-      isValid = false;
-    }
-
-    if (editingField === 'gender' && !gender) {
-      setGenderError('Gender is required to be selected');
-      isValid = false;
-    }
-
-    if (editingField === 'email' && !email) {
-      setEmailError('Email is required to be filled');
-      isValid = false;
-    } else if (editingField === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setEmailError('Enter a valid email address');
-      isValid = false;
-    }
-
-    if (editingField === 'password' && !password) {
-      setPasswordError('Password is required');
-      isValid = false;
-    } else if (editingField === 'password' && password.length < 8) {
-      setPasswordError('Password must be at least 8 characters');
-      isValid = false;
-    } else if (editingField === 'password' && !/[A-Z]/.test(password)) {
-      setPasswordError('Password must contain at least one uppercase letter');
-      isValid = false;
-    } else if (editingField === 'password' && !/[0-9]/.test(password)) {
-      setPasswordError('Password must contain at least one number');
-      isValid = false;
-    } else if (editingField === 'password' && !/[^A-Za-z0-9]/.test(password)) {
-      setPasswordError('Password must contain at least one special character');
-      isValid = false;
-    }
-
-    if (editingField === 'mobile' && !mobile) {
-      setMobileError('Mobile number is required to be filled');
-      isValid = false;
-    } else if (editingField === 'mobile' && (mobile.length !== 10 || isNaN(Number(mobile)))) {
-      setMobileError('Enter a valid 10-digit mobile number');
-      isValid = false;
-    }
-
-    return isValid;
+   
+    setErrors({
+      ...errors,
+      [field]: error
+    });
+   
+    return !error;
   };
 
-  const handleSave = () => {
-    if (validateForm()) {
-      setEditingField(null);
-      onSave && onSave();
-    }
+  const handleChange = (field, value) => {
+    onFieldChange(field, value);
+    validateField(field, value);
   };
 
-  const handleEdit = (field) => {
-    setEditingField(field);
-    onEditPress && onEditPress(field);
+  const handleFieldEdit = (field) => {
+    setEditingField(field === editingField ? null : field);
   };
 
   const renderGenderModal = () => (
@@ -547,13 +372,12 @@ const CustomInput = ({ isEditable, onEditPress, onSave }) => {
               </Text>
             </TouchableOpacity>
           ))}
-
           <View style={styles.modalButtons}>
             <TouchableOpacity
               onPress={() => {
-                setGender(tempGender);
+                handleChange('gender', tempGender);
                 setShowGenderModal(false);
-                setGenderError('');
+                setEditingField(null);
               }}
               style={styles.confirmButton}
             >
@@ -571,205 +395,72 @@ const CustomInput = ({ isEditable, onEditPress, onSave }) => {
     </Modal>
   );
 
-  return (
-    <SafeAreaView>
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.inputGroup}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.label}>First Name</Text>
-            {editingField !== 'firstName' && (
-              <TouchableOpacity onPress={() => handleEdit('firstName')}>
-                <Ionicons name="pencil" size={iconSize.sm} color={colors.orange} />
-              </TouchableOpacity>
-            )}
-          </View>
-          {editingField === 'firstName' ? (
-            <>
-              <TextInput
-                style={[styles.input, firstNameError ? styles.inputError : null]}
-                value={firstName}
-                onChangeText={(text) => {
-                  setFirstName(text);
-                  setFirstNameError('');
-                }}
-              />
-              <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
-                <Text style={styles.saveButtonText}>Save</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <Text style={styles.displayText}>{firstName}</Text>
-          )}
-          {firstNameError ? <Text style={styles.errorText}>{firstNameError}</Text> : null}
-        </View>
-
-        <View style={styles.inputGroup}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.label}>Last Name</Text>
-            {editingField !== 'lastName' && (
-              <TouchableOpacity onPress={() => handleEdit('lastName')}>
-                <Ionicons name="pencil" size={iconSize.sm} color={colors.orange} />
-              </TouchableOpacity>
-            )}
-          </View>
-          {editingField === 'lastName' ? (
-            <>
-              <TextInput
-                style={[styles.input, lastNameError ? styles.inputError : null]}
-                value={lastName}
-                onChangeText={(text) => {
-                  setLastName(text);
-                  setLastNameError('');
-                }}
-              />
-              <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
-                <Text style={styles.saveButtonText}>Save</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <Text style={styles.displayText}>{lastName || 'Not provided'}</Text>
-          )}
-          {lastNameError ? <Text style={styles.errorText}>{lastNameError}</Text> : null}
-        </View>
-
-        <View style={styles.inputGroup}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.label}>Gender</Text>
-            {editingField !== 'gender' && (
-              <TouchableOpacity onPress={() => handleEdit('gender')}>
-                <Ionicons name="pencil" size={iconSize.sm} color={colors.orange} />
-              </TouchableOpacity>
-            )}
-          </View>
-          {editingField === 'gender' ? (
+  const renderField = (label, field, isSecure = false) => (
+    <View style={styles.inputGroup}>
+      <View style={styles.labelContainer}>
+        <Text style={styles.label}>{label}</Text>
+        {isEditable && (
+          <TouchableOpacity onPress={() => handleFieldEdit(field)}>
+            <Ionicons
+              name={editingField === field ? "close" : "pencil"}
+              size={iconSize.sm}
+              color={colors.orange}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
+     
+      {editingField === field ? (
+        <>
+          {field === 'gender' ? (
             <>
               <TouchableOpacity
                 onPress={() => {
+                  setTempGender(formData.gender);
                   setShowGenderModal(true);
-                  setGenderError('');
                 }}
-                style={[styles.input, genderError ? styles.inputError : null]}
+                style={[styles.input, errors.gender && styles.inputError]}
               >
-                <Text style={{ color: gender ? 'black' : '#aaa', fontSize: 16 }}>
-                  {gender || 'Select Gender'}
+                <Text style={{ color: formData.gender ? 'black' : '#aaa', fontSize: 16 }}>
+                  {formData.gender || 'Select Gender'}
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
-                <Text style={styles.saveButtonText}>Save</Text>
-              </TouchableOpacity>
+              {renderGenderModal()}
             </>
           ) : (
-            <Text style={styles.displayText}>{gender || 'Not provided'}</Text>
+            <TextInput
+              style={[styles.input, errors[field] && styles.inputError]}
+              value={formData[field]}
+              onChangeText={(text) => handleChange(field, text)}
+              secureTextEntry={isSecure}
+              placeholder={`Enter your ${label.toLowerCase()}`}
+              keyboardType={field === 'mobile' ? 'numeric' : 'default'}
+              autoCapitalize={field === 'email' ? 'none' : 'words'}
+            />
           )}
-          {genderError ? <Text style={styles.errorText}>{genderError}</Text> : null}
-        </View>
+          {errors[field] && <Text style={styles.errorText}>{errors[field]}</Text>}
+        </>
+      ) : (
+        <Text style={styles.displayText}>
+          {isSecure ? '••••••••' : (formData[field] || 'Not provided')}
+        </Text>
+      )}
+    </View>
+  );
 
-        {renderGenderModal()}
-
-        <View style={styles.inputGroup}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.label}>Email ID</Text>
-            {editingField !== 'email' && (
-              <TouchableOpacity onPress={() => handleEdit('email')}>
-                <Ionicons name="pencil" size={iconSize.sm} color={colors.orange} />
-              </TouchableOpacity>
-            )}
-          </View>
-          {editingField === 'email' ? (
-            <>
-              <TextInput
-                style={[styles.input, emailError ? styles.inputError : null]}
-                value={email}
-                onChangeText={(text) => {
-                  setEmail(text);
-                  setEmailError('');
-                }}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-              <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
-                <Text style={styles.saveButtonText}>Save</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <Text style={styles.displayText}>{email}</Text>
-          )}
-          {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-        </View>
-
-        <View style={styles.inputGroup}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.label}>Password</Text>
-            {editingField !== 'password' && (
-              <TouchableOpacity onPress={() => handleEdit('password')}>
-                <Ionicons name="pencil" size={iconSize.sm} color={colors.orange} />
-              </TouchableOpacity>
-            )}
-          </View>
-          {editingField === 'password' ? (
-            <>
-              <TextInput
-                style={[styles.input, passwordError ? styles.inputError : null]}
-                value={password}
-                onChangeText={(text) => {
-                  setPassword(text);
-                  setPasswordError('');
-                }}
-                secureTextEntry={true}
-                placeholder="At least 8 characters with uppercase, number & special char"
-              />
-              <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
-                <Text style={styles.saveButtonText}>Save</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <Text style={styles.displayText}>••••••••</Text>
-          )}
-          {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
-        </View>
-
-        <View style={styles.inputGroup}>
-          <View style={styles.labelContainer}>
-            <Text style={styles.label}>Mobile Number</Text>
-            {editingField !== 'mobile' && (
-              <TouchableOpacity onPress={() => handleEdit('mobile')}>
-                <Ionicons name="pencil" size={iconSize.sm} color={colors.orange} />
-              </TouchableOpacity>
-            )}
-          </View>
-          {editingField === 'mobile' ? (
-            <>
-              <TextInput
-                style={[styles.input, mobileError ? styles.inputError : null]}
-                keyboardType="numeric"
-                value={mobile}
-                onChangeText={(text) => {
-                  setMobile(text);
-                  setMobileError('');
-                }}
-                maxLength={10}
-              />
-              <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
-                <Text style={styles.saveButtonText}>Save</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <Text style={styles.displayText}>{mobile || 'Not provided'}</Text>
-          )}
-          {mobileError ? <Text style={styles.errorText}>{mobileError}</Text> : null}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+  return (
+    <View>
+      {renderField('First Name', 'firstName')}
+      {renderField('Last Name', 'lastName')}
+      {renderField('Gender', 'gender')}
+      {renderField('Email ID', 'email')}
+      {renderField('Password', 'password', true)}
+      {renderField('Mobile Number', 'mobile')}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    backgroundColor: '#fff',
-    flexGrow: 1,
-    marginTop: 20
-  },
   inputGroup: {
     marginBottom: 15
   },
@@ -790,7 +481,6 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 16,
     width: '100%',
-    alignSelf: 'stretch',
     backgroundColor: '#fff',
     marginTop: 5
   },
@@ -861,17 +551,6 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   buttonText: {
-    fontWeight: 'bold'
-  },
-  saveButton: {
-    backgroundColor: colors.orange,
-    padding: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 10
-  },
-  saveButtonText: {
-    color: '#fff',
     fontWeight: 'bold'
   }
 });

@@ -1,14 +1,16 @@
 import * as React from 'react';
-import {View, Text, Image, StyleSheet} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-
 import Home from './src/Home';
 import Login from './src/Login';
 import SignUp from './src/SignUp';
 import Profile from './src/Profile';
 import Details from './src/Details';
+import CartScreen from './src/CartScreen';
+import CheckoutScreen from './src/CheckoutScreen';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -41,58 +43,72 @@ function HomeStack() {
         component={SignUp}
         options={{headerShown: false}}
       />
+      <Stack.Screen
+        name="Details"
+        component={Details}
+        options={{headerShown: false}}
+      />
     </Stack.Navigator>
   );
 }
+
+function CartStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Cart"
+        component={CartScreen}
+        options={{title: 'Your Cart'}}
+      />
+      <Stack.Screen
+        name="Checkout"
+        component={CheckoutScreen}
+        options={{title: 'Checkout'}}
+      />
+    </Stack.Navigator>
+  );
+}
+
 export default function App() {
   return (
     <View style={styles.container}>
       <NavigationContainer>
-        <Tab.Navigator screenOptions={{tabBarStyle: 90}}>
+        <Tab.Navigator
+          screenOptions={({route}) => ({
+            tabBarIcon: ({focused, color, size}) => {
+              let iconName;
+
+              if (route.name === 'HomeStack') {
+                iconName = focused ? 'home' : 'home-outline';
+              } else if (route.name === 'Profile') {
+                iconName = focused ? 'person' : 'person-outline';
+              } else if (route.name === 'CartStack') {
+                iconName = focused ? 'cart' : 'cart-outline';
+              }
+
+              return <Ionicons name={iconName} size={size} color={color} />;
+            },
+            tabBarActiveTintColor: 'tomato',
+            tabBarInactiveTintColor: 'gray',
+            headerShown: false,
+          })}>
           <Tab.Screen
             name="HomeStack"
             component={HomeStack}
             options={{
-              headerShown: false,
               title: 'Home',
-              tabBarIcon: ({size, color}) => {
-                return (
-                  <Image
-                    style={{width: size, height: size, tintColor: color}}
-                    source={require('./images/Home.png')}
-                  />
-                );
-              },
-            }}></Tab.Screen>
+            }}
+          />
+          <Tab.Screen
+            name="CartStack"
+            component={CartStack}
+            options={{title: 'Cart'}}
+          />
           <Tab.Screen
             name="Profile"
             component={Profile}
-            options={{
-              tabBarIcon: ({size}) => {
-                return (
-                  <Image
-                    style={{width: size, height: size}}
-                    source={require('./images/Profile.jpg')}
-                  />
-                );
-              },
-            }}
+            options={{title: 'Profile'}}
           />
-          <Tab.Screen
-            name="Details"
-            component={Details}
-            options={{
-              tabBarIcon: ({size, color}) => {
-                return (
-                  <Image
-                    style={{width: size, height: size, tintColor: color}}
-                    source={require('./images/Details.png')}
-                  />
-                );
-              },
-            }}
-          />
-          
         </Tab.Navigator>
       </NavigationContainer>
     </View>
