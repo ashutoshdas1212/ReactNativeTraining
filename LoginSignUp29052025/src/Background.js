@@ -1,20 +1,17 @@
-
 import React from 'react';
-import { View, ImageBackground, StyleSheet } from 'react-native';
+import {View, ImageBackground, StyleSheet} from 'react-native';
 
 const Background = ({children}) => {
   return (
     <View style={styles.container}>
-      <ImageBackground 
-        source={require("./assets/abstract.jpg")} 
+      <ImageBackground
+        source={require('./assets/abstract.jpg')}
         style={styles.backgroundImage}
       />
-      <View style={styles.overlay}>
-        {children}
-      </View>
+      <View style={styles.overlay}>{children}</View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -30,7 +27,7 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.3)', // Optional: adds a slight dark overlay
-  }
+  },
 });
 
 export default Background;
