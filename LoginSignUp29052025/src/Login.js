@@ -1,46 +1,4 @@
-// import React from 'react';
-// import {View, Text} from 'react-native';
-// import Background from './Background';
-// import {darkGreen} from './Constants';
-
-// const Login = () => {
-//   return (
-//     <Background>
-//       <View style={{alignItems: 'center', width: 400}}>
-//         <Text
-//           style={{
-//             color: 'white',
-//             fontSize: 64,
-//             fontWeight: 'bold',
-//             marginVertical: 10,
-//           }}>
-//           Login
-//         </Text>
-
-//         <View
-//           style={{
-//             backgroundColor: 'white',
-//             height: 700,
-//             width: 460,
-//             borderTopLeftRadius: 130,
-//             paddingTop: 100,
-//             alignItems: 'center',
-//           }}>
-//           <Text style={{fontSize: 40, color: darkGreen, fontWeight: 'bold'}}>
-//             Welcome Back
-//           </Text>
-//           <Text style={{color:"grey",fontSize:19,fontWeight:"bold",marginBottom:20}}> Login to your account</Text>
-//         </View>
-//       </View>
-//     </Background>
-//   );
-// };
-
-// export default Login;
-
-
-
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -51,13 +9,13 @@ import {
   SafeAreaView,
   Platform,
   ActivityIndicator,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
 } from 'react-native';
-import Btn from './Btn'
+import Btn from './Btn';
 
-import {useNavigation} from "@react-navigation/native"
+import {useNavigation} from '@react-navigation/native';
 
-const Login = (props) => {
+const Login = props => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -94,12 +52,10 @@ const Login = (props) => {
 
     setIsLoading(true);
     try {
-     
       await new Promise(resolve => setTimeout(resolve, 1500));
       Alert.alert('Success', 'Logged in successfully!');
 
-      navigation.navigate('Home',{email:email});
-
+      navigation.navigate('Home', {email: email});
     } catch (error) {
       Alert.alert('Error', 'Failed to login. Please try again.');
     } finally {
@@ -114,84 +70,80 @@ const Login = (props) => {
   const handleForgotPassword = () => {
     Alert.alert('Forgot Password', 'Password reset would be handled here');
   };
-   const navigation =useNavigation();
+  const navigation = useNavigation();
 
   return (
-   
     <SafeAreaView style={styles.container}>
-    
-        <View style={styles.innerContainer}>
-          <Text style={styles.title}>Welcome Back</Text>
-          <Text style={styles.subtitle}>Sign in to continue</Text>
+      <View style={styles.innerContainer}>
+        <Text style={styles.title}>Welcome Back</Text>
+        <Text style={styles.subtitle}>Sign in to continue</Text>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={[styles.input, emailError ? styles.inputError : null]}
-              value={email}
-              onChangeText={(text) => {
-                setEmail(text);
-                setEmailError('');
-              }}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              placeholder="Enter your email"
-              placeholderTextColor="#999"
-            />
-            {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={[styles.input, passwordError ? styles.inputError : null]}
-              value={password}
-              onChangeText={(text) => {
-                setPassword(text);
-                setPasswordError('');
-              }}
-              secureTextEntry={true}
-              placeholder="Enter your password"
-              placeholderTextColor="#999"
-            />
-            {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
-          </View>
-
-          <TouchableOpacity
-            onPress={handleLogin}
-            style={styles.loginButton}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Sign In</Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={handleForgotPassword}
-            style={styles.forgotPasswordButton}
-          >
-            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-          </TouchableOpacity>
-
-          <View style={styles.signUpContainer}>
-            <Text style={styles.signUpText}>Don't have an account?</Text>
-            <TouchableOpacity onPress={handleRegister}>
-              {/* <Text style={styles.signUpLink}>Sign Up</Text>
-              <Btn bgColor='white' style={styles.signUpLink} btnLabel="SignUp" Press={()=>props.navigation.navigate("SignUp")} /> */}
-             <TouchableOpacity
-                     onPress={()=>navigation.navigate("SignUp")}><Text style={styles.signUpLink}>Sign Up</Text></TouchableOpacity>
-            </TouchableOpacity>
-            
-         
-            
-          </View>
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={[styles.input, emailError ? styles.inputError : null]}
+            value={email}
+            onChangeText={text => {
+              setEmail(text);
+              setEmailError('');
+            }}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            placeholder="Enter your email"
+            placeholderTextColor="#999"
+          />
+          {emailError ? (
+            <Text style={styles.errorText}>{emailError}</Text>
+          ) : null}
         </View>
-      
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Password</Text>
+          <TextInput
+            style={[styles.input, passwordError ? styles.inputError : null]}
+            value={password}
+            onChangeText={text => {
+              setPassword(text);
+              setPasswordError('');
+            }}
+            secureTextEntry={true}
+            placeholder="Enter your password"
+            placeholderTextColor="#999"
+          />
+          {passwordError ? (
+            <Text style={styles.errorText}>{passwordError}</Text>
+          ) : null}
+        </View>
+
+        <TouchableOpacity
+          onPress={handleLogin}
+          style={styles.loginButton}
+          disabled={isLoading}>
+          {isLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Sign In</Text>
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={handleForgotPassword}
+          style={styles.forgotPasswordButton}>
+          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+        </TouchableOpacity>
+
+        <View style={styles.signUpContainer}>
+          <Text style={styles.signUpText}>Don't have an account?</Text>
+          <TouchableOpacity onPress={handleRegister}>
+            {/* <Text style={styles.signUpLink}>Sign Up</Text>
+              <Btn bgColor='white' style={styles.signUpLink} btnLabel="SignUp" Press={()=>props.navigation.navigate("SignUp")} /> */}
+            <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+              <Text style={styles.signUpLink}>Sign Up</Text>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </View>
+      </View>
     </SafeAreaView>
-  
   );
 };
 
