@@ -20,7 +20,7 @@ const Profile = () => {
   });
 
   const validateForm = () => {
-    // Basic validation - you can expand this
+   
     if (!formData.firstName.trim()) {
       Alert.alert('Error', 'First name is required');
       return false;
@@ -60,7 +60,7 @@ const Profile = () => {
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
-        <ProfileHeader/>
+        {/* <ProfileHeader/> */}
        
         <View style={styles.profileImageContainer}>
           <Image source={require("../images/ProfileDp.jpg")} style={styles.profileImage}/>
