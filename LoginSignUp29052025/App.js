@@ -166,6 +166,7 @@ function MainDrawerNavigator() {
             <Ionicons name="home" color={color} size={size} />
           ),
           headerTitle: 'Main Screen',
+          headerTitleAlign: 'center'
         }}
       />
       <Drawer.Screen
@@ -178,6 +179,7 @@ function MainDrawerNavigator() {
             <Ionicons name="list" color={color} size={size} />
           ),
           headerTitle: 'Your Orders',
+          headerTitleAlign: 'center'
         }}
       />
       <Drawer.Screen
@@ -190,6 +192,7 @@ function MainDrawerNavigator() {
             <Ionicons name="heart" color={color} size={size} />
           ),
           headerTitle: 'Your Wishlist',
+          headerTitleAlign: 'center'
         }}
       />
       <Drawer.Screen
@@ -202,6 +205,7 @@ function MainDrawerNavigator() {
             <Ionicons name="settings" color={color} size={size} />
           ),
           headerTitle: 'App Settings',
+          headerTitleAlign: 'center'
         }}
       />
       <Drawer.Screen
@@ -214,6 +218,7 @@ function MainDrawerNavigator() {
             <Ionicons name="help-circle" color={color} size={size} />
           ),
           headerTitle: 'Help Center',
+          headerTitleAlign: 'center', 
         }}
       />
     

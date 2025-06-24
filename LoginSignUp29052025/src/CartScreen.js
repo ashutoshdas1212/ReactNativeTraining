@@ -30,8 +30,8 @@ const CartScreen = ({navigation}) => {
               : item,
           ),
         );
-      } else {
-        setCartItems([...cartItems, {...route.params.product, quantity: 1}]);
+      } else {setCartItems([...cartItems, {...route.params.product, quantity: 1}]);
+        
       }
     }
   }, [route.params?.product]);
@@ -263,3 +263,96 @@ const styles = StyleSheet.create({
 });
 
 export default CartScreen;
+
+
+
+// import React,{useState,useEffect} from 'react';
+
+// import{View,Text,StyleSheet,FlatList,Image,TouchableOpacity,SafeAreaView,Alert} from 'react-native'
+
+// import { useNavigation,useRoute } from '@react-navigation/native';
+
+// import Ionicons from 'react-native-vector-icons/Ionicons';
+
+// import {colors } from './Constants'
+
+// const CartScreen =({navigation})=>{
+//  const [cartItem,setCartItem]=useState([]);
+//  const route=useRoute();
+
+//  useEffect(()=>{
+//   if(route.params?.product)
+//   {
+//     const existingItem=cartItems.find(
+//       item=>item.id===route.params.product.id,
+//     );
+
+//   if(existingItem)
+//   {
+//     setCartItems(
+
+//       cartItems.map(item=> item.id=== route.params.product.id
+//         ?{...item,quantity:item.quantity+1}:item,
+
+//       ),
+
+//     );
+//   }
+//   else{
+//     setCartItems([...cartItems,{...route.params.product,quantity:1}])
+//   }
+
+    
+//   }
+
+    
+//  },[route.params?.product]);
+
+// const updateQuantity=(itemId,newQuanitity)=>{
+//   if(newQuantity<1)
+//   {
+//     removeFromCart(itemId);
+//     return;
+//   }
+//   setCartItems(
+//     cartItems.map(item=>item.id===itemId?{...item,quantity:newQuantity}:item)
+//   );
+// };
+
+// const removeFromCart=itemId=>{
+//   setCartItems(cartItems.filter(item=>item.id!==itemId));
+// };
+
+
+
+
+
+// return(
+//   <SafeAreaView  >
+//    <View >
+// <TouchableOpacity onPress={()=>navigation.goBack()}>
+// <Ionicons name="arrow-black" size={24} color="black"/>
+
+// </TouchableOpacity>
+
+// <Text >Your Cart</Text>
+// <View/>
+// </View>
+
+// {cartItems.length ===0?(
+
+//   <View>
+// <Ionicons/>
+// <Text>Your Cart is empty</Text>
+// <TouchableOpacity> onPress={()=>navigation.navigate('HomeStack')}</TouchableOpacity>
+//   </View>
+// )
+
+// }
+
+
+//    </View>
+
+
+//   </SafeAreaView>
+// )
