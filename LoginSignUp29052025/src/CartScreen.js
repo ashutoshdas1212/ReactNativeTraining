@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useReducer, useEffect, useCallback, useMemo} from 'react';
 import {
   View,
   Text,
@@ -12,93 +12,76 @@ import {
 import {useNavigation, useRoute} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {colors} from './Constants';
+import {cartReducer} from './cartReducer';
 
 const CartScreen = ({navigation}) => {
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, dispatch] = useReducer(cartReducer, []);
   const route = useRoute();
 
   useEffect(() => {
     if (route.params?.product) {
-      const existingItem = cartItems.find(
-        item => item.id === route.params.product.id,
-      );
-      if (existingItem) {
-        setCartItems(
-          cartItems.map(item =>
-            item.id === route.params.product.id
-              ? {...item, quantity: item.quantity + 1}
-              : item,
-          ),
-        );
-      } else {setCartItems([...cartItems, {...route.params.product, quantity: 1}]);
-        
-      }
+      dispatch({type: 'ADD_ITEM', product: route.params.product});
     }
   }, [route.params?.product]);
 
-  const updateQuantity = (itemId, newQuantity) => {
-    if (newQuantity < 1) {
-      removeFromCart(itemId);
-      return;
-    }
-    setCartItems(
-      cartItems.map(item =>
-        item.id === itemId ? {...item, quantity: newQuantity} : item,
-      ),
-    );
-  };
+  const updateQuantity = useCallback((itemId, newQuantity) => {
+    dispatch({type: 'UPDATE_QUANTITY', itemId, newQuantity});
+  }, []);
 
-  const removeFromCart = itemId => {
-    setCartItems(cartItems.filter(item => item.id !== itemId));
-  };
+  const removeFromCart = useCallback(itemId => {
+    dispatch({type: 'REMOVE_ITEM', itemId});
+  }, []);
 
-  const calculateTotal = () => {
+  const calculateTotal = useMemo(() => {
     return cartItems
       .reduce((total, item) => total + item.price * item.quantity, 0)
       .toFixed(2);
-  };
+  }, [cartItems]);
 
-  const handleCheckout = () => {
+  const handleCheckout = useCallback(() => {
     navigation.navigate('Checkout', {
-      cartItems: cartItems,
-      total: calculateTotal(),
+      cartItems,
+      total: calculateTotal,
     });
-  };
+  }, [cartItems, calculateTotal, navigation]);
 
-  const renderItem = ({item}) => (
-    <View style={styles.cartItem}>
-      <Image source={{uri: item.image}} style={styles.itemImage} />
-      <View style={styles.itemDetails}>
-        <Text style={styles.itemTitle} numberOfLines={2}>
-          {item.title}
-        </Text>
-        <Text style={styles.itemPrice}>
-          ${(item.price * item.quantity).toFixed(2)}
-        </Text>
+  const renderItem = useCallback(
+    ({item}) => (
+      <View style={styles.cartItem}>
+        <Image source={{uri: item.image}} style={styles.itemImage} />
+        <View style={styles.itemDetails}>
+          <Text style={styles.itemTitle} numberOfLines={2}>
+            {item.title}
+          </Text>
+          <Text style={styles.itemPrice}>
+            ${(item.price * item.quantity).toFixed(2)}
+          </Text>
 
-        <View style={styles.quantityContainer}>
+          <View style={styles.quantityContainer}>
+            <TouchableOpacity
+              style={styles.quantityButton}
+              onPress={() => updateQuantity(item.id, item.quantity - 1)}>
+              <Ionicons name="remove" size={20} color="black" />
+            </TouchableOpacity>
+
+            <Text style={styles.quantityText}>{item.quantity}</Text>
+
+            <TouchableOpacity
+              style={styles.quantityButton}
+              onPress={() => updateQuantity(item.id, item.quantity + 1)}>
+              <Ionicons name="add" size={20} color="black" />
+            </TouchableOpacity>
+          </View>
+
           <TouchableOpacity
-            style={styles.quantityButton}
-            onPress={() => updateQuantity(item.id, item.quantity - 1)}>
-            <Ionicons name="remove" size={20} color="black" />
-          </TouchableOpacity>
-
-          <Text style={styles.quantityText}>{item.quantity}</Text>
-
-          <TouchableOpacity
-            style={styles.quantityButton}
-            onPress={() => updateQuantity(item.id, item.quantity + 1)}>
-            <Ionicons name="add" size={20} color="black" />
+            style={styles.removeButton}
+            onPress={() => removeFromCart(item.id)}>
+            <Ionicons name="trash-outline" size={20} color="red" />
           </TouchableOpacity>
         </View>
-
-        <TouchableOpacity
-          style={styles.removeButton}
-          onPress={() => removeFromCart(item.id)}>
-          <Ionicons name="trash-outline" size={20} color="red" />
-        </TouchableOpacity>
       </View>
-    </View>
+    ),
+    [updateQuantity, removeFromCart],
   );
 
   return (
@@ -130,7 +113,7 @@ const CartScreen = ({navigation}) => {
             contentContainerStyle={styles.listContent}
           />
           <View style={styles.totalContainer}>
-            <Text style={styles.totalText}>Total: ${calculateTotal()}</Text>
+            <Text style={styles.totalText}>Total: ${calculateTotal}</Text>
             <TouchableOpacity
               style={styles.checkoutButton}
               onPress={handleCheckout}>
@@ -263,96 +246,3 @@ const styles = StyleSheet.create({
 });
 
 export default CartScreen;
-
-
-
-// import React,{useState,useEffect} from 'react';
-
-// import{View,Text,StyleSheet,FlatList,Image,TouchableOpacity,SafeAreaView,Alert} from 'react-native'
-
-// import { useNavigation,useRoute } from '@react-navigation/native';
-
-// import Ionicons from 'react-native-vector-icons/Ionicons';
-
-// import {colors } from './Constants'
-
-// const CartScreen =({navigation})=>{
-//  const [cartItem,setCartItem]=useState([]);
-//  const route=useRoute();
-
-//  useEffect(()=>{
-//   if(route.params?.product)
-//   {
-//     const existingItem=cartItems.find(
-//       item=>item.id===route.params.product.id,
-//     );
-
-//   if(existingItem)
-//   {
-//     setCartItems(
-
-//       cartItems.map(item=> item.id=== route.params.product.id
-//         ?{...item,quantity:item.quantity+1}:item,
-
-//       ),
-
-//     );
-//   }
-//   else{
-//     setCartItems([...cartItems,{...route.params.product,quantity:1}])
-//   }
-
-    
-//   }
-
-    
-//  },[route.params?.product]);
-
-// const updateQuantity=(itemId,newQuanitity)=>{
-//   if(newQuantity<1)
-//   {
-//     removeFromCart(itemId);
-//     return;
-//   }
-//   setCartItems(
-//     cartItems.map(item=>item.id===itemId?{...item,quantity:newQuantity}:item)
-//   );
-// };
-
-// const removeFromCart=itemId=>{
-//   setCartItems(cartItems.filter(item=>item.id!==itemId));
-// };
-
-
-
-
-
-// return(
-//   <SafeAreaView  >
-//    <View >
-// <TouchableOpacity onPress={()=>navigation.goBack()}>
-// <Ionicons name="arrow-black" size={24} color="black"/>
-
-// </TouchableOpacity>
-
-// <Text >Your Cart</Text>
-// <View/>
-// </View>
-
-// {cartItems.length ===0?(
-
-//   <View>
-// <Ionicons/>
-// <Text>Your Cart is empty</Text>
-// <TouchableOpacity> onPress={()=>navigation.navigate('HomeStack')}</TouchableOpacity>
-//   </View>
-// )
-
-// }
-
-
-//    </View>
-
-
-//   </SafeAreaView>
-// )

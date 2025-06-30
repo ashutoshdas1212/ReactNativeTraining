@@ -12,6 +12,7 @@ import {
 import {useNavigation, useRoute} from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {colors} from './Constants';
+import Button from './components/Button';
 
 const CheckoutScreen = () => {
   const route = useRoute();
@@ -207,11 +208,13 @@ const CheckoutScreen = () => {
         </View>
       </ScrollView>
 
-      <TouchableOpacity
-        style={styles.placeOrderButton}
-        onPress={handlePlaceOrder}>
-        <Text style={styles.placeOrderText}>Place Order</Text>
-      </TouchableOpacity>
+    <Button
+  title="Place Order"
+  color="orange"
+  size="large"
+  onPress={handlePlaceOrder}
+  width="full"
+/>
     </SafeAreaView>
   );
 };
