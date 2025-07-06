@@ -295,7 +295,6 @@
 
 // export default Home;
 
-
 import React, {useState, useEffect, useMemo, useCallback} from 'react';
 import {
   View,
@@ -348,55 +347,67 @@ const Home = props => {
     fetchProducts();
   }, [fetchProducts]);
 
-  const handleProductPress = useCallback((product) => {
-    navigation.navigate('Details', {product});
-  }, [navigation]);
+  const handleProductPress = useCallback(
+    product => {
+      navigation.navigate('Details', {product});
+    },
+    [navigation],
+  );
 
-  const handleAddToCart = useCallback((product) => {
-    navigation.navigate('CartStack', {
-      screen: 'Cart',
-      params: {product},
-    });
-  }, [navigation]);
+  const handleAddToCart = useCallback(
+    product => {
+      navigation.navigate('CartStack', {
+        screen: 'Cart',
+        params: {product},
+      });
+    },
+    [navigation],
+  );
 
-  const handleBuyNow = useCallback((product) => {
-    navigation.navigate('CartStack', {
-      screen: 'Checkout',
-      params: {
-        cartItems: [{...product, quantity: 1}],
-        total: product.price.toFixed(2),
-      },
-    });
-  }, [navigation]);
+  const handleBuyNow = useCallback(
+    product => {
+      navigation.navigate('CartStack', {
+        screen: 'Checkout',
+        params: {
+          cartItems: [{...product, quantity: 1}],
+          total: product.price.toFixed(2),
+        },
+      });
+    },
+    [navigation],
+  );
 
   const memoizedProducts = useMemo(() => products, [products]);
 
-  const renderItem = useCallback(({item}) => (
-    <TouchableOpacity
-      style={styles.cardContainer}
-      onPress={() => handleProductPress(item)}>
-      <Image source={{uri: item.image}} style={styles.image} />
-      <Text style={styles.title} numberOfLines={2}>
-        {item.title}
-      </Text>
-      <Text style={styles.price}>${item.price}</Text>
-      <Text style={styles.rating}>
-        Rating: {item.rating.rate} ({item.rating.count})
-      </Text>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[styles.actionButton, {backgroundColor: darkGreen}]}
-          onPress={() => handleBuyNow(item)}>
-          <Text style={styles.buttonText}>Buy Now</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.actionButton, {backgroundColor: '#FF9900'}]}
-          onPress={() => handleAddToCart(item)}>
-          <Text style={styles.buttonText}>Add to Cart</Text>
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
-  ), [handleProductPress, handleBuyNow, handleAddToCart]);
+  const renderItem = useCallback(
+    ({item}) => (
+      <TouchableOpacity
+        style={styles.cardContainer}
+        onPress={() => handleProductPress(item)}>
+        <Image source={{uri: item.image}} style={styles.image} />
+        <Text style={styles.title} numberOfLines={2}>
+          {item.title}
+        </Text>
+        <Text style={styles.price}>${item.price}</Text>
+        <Text style={styles.rating}>
+          Rating: {item.rating.rate} ({item.rating.count})
+        </Text>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={[styles.actionButton, {backgroundColor: darkGreen}]}
+            onPress={() => handleBuyNow(item)}>
+            <Text style={styles.buttonText}>Buy Now</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionButton, {backgroundColor: '#FF9900'}]}
+            onPress={() => handleAddToCart(item)}>
+            <Text style={styles.buttonText}>Add to Cart</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    ),
+    [handleProductPress, handleBuyNow, handleAddToCart],
+  );
 
   if (loading && !refreshing) {
     return (
