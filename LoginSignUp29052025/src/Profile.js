@@ -426,34 +426,34 @@
 
 // export default Profile;
 
+import React, { useState, useCallback } from 'react';
 import {
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
   View,
-  ScrollView,
+  Text,
   SafeAreaView,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
   Alert,
-  Modal,
   PermissionsAndroid,
   Platform,
-  Linking,
 } from 'react-native';
-import React, {useState, useCallback} from 'react';
-import ProfileHeader from './components/ProfileHeader';
-import {fontSize, iconSize, spacing} from '../constants/dimensions';
-import {colors} from './Constants';
-import Feather from 'react-native-vector-icons/Feather';
-import {fontFamily} from '../constants/fontFamily';
-import CustomInput from './components/CustomInput';
+
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import Feather from 'react-native-vector-icons/Feather';
+import CustomInput from './components/CustomInput';
+import ProfileHeader from './components/ProfileHeader';
+import { fontSize, iconSize, spacing } from '../constants/dimensions';
+import { fontFamily } from '../constants/fontFamily';
+import { colors } from './Constants';
+import { launchImageLibrary as _launchImageLibrary, launchCamera as _launchCamera } from 'react-native-image-picker';
+let launchImageLibrary = _launchImageLibrary;
+let launchCamera = _launchCamera;
 
 const Profile = () => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [showImagePickerModal, setShowImagePickerModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: 'Samazon',
     lastName: 'User',
@@ -463,151 +463,111 @@ const Profile = () => {
     mobile: '9876543210',
   });
 
-  // Check if permission is already granted
-  const checkPermission = async (permission) => {
-    if (Platform.OS === 'android') {
-      try {
-        const status = await PermissionsAndroid.check(permission);
-        return status;
-      } catch (err) {
-        console.warn('Permission check error:', err);
-        return false;
-      }
-    }
-    return true;
+ 
+  // const requestGalleryPermission = async () => {
+  //   if (Platform.OS === 'android') {
+  //     try {
+  //       const permission = PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES;
+  //       const granted = await PermissionsAndroid.request(permission, {
+  //         title: "Gallery Permission",
+  //         message: "App needs access to your photos",
+  //         buttonPositive: "OK"
+  //       });
+  //       return granted === PermissionsAndroid.RESULTS.GRANTED;
+  //     } catch (err) {
+  //       console.warn(err);
+  //       return false;
+  //     }
+  //   }
+  //   return true;
+  // };
+
+
+  // const handleImageResponse = (response) => {
+  //   if (response.didCancel) {
+  //     return;
+  //   } else if (response.errorCode) {
+  //     Alert.alert('Error', `Image picker error: ${response.errorMessage}`);
+  //   } else if (response.assets && response.assets.length > 0) {
+  //     setSelectedImage(response.assets[0].uri);
+  //   }
+  // };
+
+
+  // const openImagePicker = async () => {
+  //   const granted = await requestGalleryPermission();
+  //   if (!granted) {
+  //     Alert.alert('Permission Denied', 'Cannot access photos.');
+  //     return;
+  //   }
+
+  //   launchImageLibrary(
+  //     {
+  //       mediaType: 'photo',
+  //       quality: 0.8,
+  //       maxWidth: 500,
+  //       maxHeight: 500,
+  //     },
+  //     handleImageResponse
+  //   );
+  // };
+
+
+  // const openCamera = async () => {
+  //   if (Platform.OS === 'android') {
+  //     const granted = await PermissionsAndroid.request(
+  //       PermissionsAndroid.PERMISSIONS.CAMERA
+  //     );
+  //     if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+  //       Alert.alert('Permission denied', 'Camera permission is required.');
+  //       return;
+  //     }
+  //   }
+
+  //   launchCamera(
+  //     {
+  //       mediaType: 'photo',
+  //       quality: 0.8,
+  //       maxWidth: 500,
+  //       maxHeight: 500,
+  //     },
+  //     handleImageResponse
+  //   );
+  // };
+
+const openImagePicker = () => {
+    const options = {
+      mediaType: 'photo',
+      includeBase64: false,
+      maxHeight: 2000,
+      maxWidth: 2000,
+    };
+
+    launchImageLibrary(options, handleResponse);
   };
 
-  // Request only the necessary permissions
-  const requestStoragePermission = async () => {
-    if (Platform.OS !== 'android') return true;
-   
-    try {
-      // Determine which permission to request based on Android version
-      const apiLevel = Platform.constants?.Release || 0;
-      const versionNumber = parseInt(apiLevel) || 0;
-      const isAndroid13OrHigher = versionNumber >= 33;
-     
-      const permission = isAndroid13OrHigher
-        ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
-        : PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
+  const openCamera = () => {
+    const options = {
+      mediaType: 'photo',
+      includeBase64: false,
+      maxHeight: 2000,
+      maxWidth: 2000,
+    };
 
-      // Check if we already have permission
-      const hasPermission = await checkPermission(permission);
-      if (hasPermission) return true;
-
-      // Request permission
-      const result = await PermissionsAndroid.request(permission, {
-        title: 'Storage Permission',
-        message: 'App needs access to your storage to select photos',
-        buttonPositive: 'OK',
-      });
-
-      return result === PermissionsAndroid.RESULTS.GRANTED;
-    } catch (err) {
-      console.warn('Permission request error:', err);
-      return false;
-    }
+    launchCamera(options, handleResponse);
   };
 
-  const openGallery = async () => {
-    try {
-      // Always request permission before opening gallery
-      const hasPermission = await requestStoragePermission();
-     
-      if (!hasPermission) {
-        Alert.alert(
-          'Permission Required',
-          'Storage permission is required to access your photos. Please enable it in app settings.',
-          [
-            {text: 'Cancel', style: 'cancel'},
-            {text: 'Open Settings', onPress: () => Linking.openSettings()}
-          ]
-        );
-        return;
-      }
-
-      // Open the gallery
-      const result = await launchImageLibrary({
-        mediaType: 'photo',
-        quality: 1,
-        includeBase64: false,
-        selectionLimit: 1,
-      });
-
-      if (result.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (result.errorCode) {
-        console.log('ImagePicker Error:', result.errorMessage);
-        Alert.alert('Error', `Could not select image: ${result.errorMessage}`);
-      } else if (result.assets && result.assets.length > 0) {
-        const source = { uri: result.assets[0].uri };
-        setSelectedImage(source);
-      }
-    } catch (error) {
-      console.log('Gallery Error:', error);
-      Alert.alert(
-        'Error',
-        'Could not open gallery. Please try again.',
-        [{text: 'OK'}]
-      );
-    }
-  };
-
-  const openCamera = async () => {
-    try {
-      // Request camera permission
-      if (Platform.OS === 'android') {
-        const hasPermission = await checkPermission(PermissionsAndroid.PERMISSIONS.CAMERA);
-        if (!hasPermission) {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.CAMERA,
-            {
-              title: 'Camera Permission',
-              message: 'App needs access to your camera',
-              buttonPositive: 'OK',
-            }
-          );
-          if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-            Alert.alert('Camera permission denied');
-            return;
-          }
-        }
-      }
-
-      // Open camera
-      const result = await launchCamera({
-        mediaType: 'photo',
-        quality: 1,
-        includeBase64: false,
-      });
-
-      if (result.didCancel) {
-        console.log('User cancelled camera');
-      } else if (result.errorCode) {
-        console.log('Camera Error:', result.errorMessage);
-        Alert.alert('Error', `Could not take photo: ${result.errorMessage}`);
-      } else if (result.assets && result.assets.length > 0) {
-        const source = { uri: result.assets[0].uri };
-        setSelectedImage(source);
-      }
-    } catch (error) {
-      console.log('Camera Error:', error);
-      Alert.alert(
-        'Error',
-        'Could not open camera. Please try again.',
-        [{text: 'OK'}]
-      );
-    }
-  };
-
-  const handleImagePicker = (type) => {
-    setShowImagePickerModal(false);
-    if (type === 'camera') {
-      openCamera();
+  const handleResponse = (response) => {
+    if (response.didCancel) {
+      console.log('User cancelled image picker');
+    } else if (response.error) {
+      console.log('Image picker error: ', response.error);
     } else {
-      openGallery();
+      let imageUri = response.uri || response.assets?.[0]?.uri;
+      setSelectedImage(imageUri);
     }
   };
+
 
   const validateForm = useCallback(() => {
     if (!formData.firstName.trim()) {
@@ -621,10 +581,7 @@ const Profile = () => {
       Alert.alert('Error', 'Please enter a valid email');
       return false;
     }
-    if (
-      formData.mobile &&
-      (formData.mobile.length !== 10 || isNaN(formData.mobile))
-    ) {
+    if (formData.mobile && (formData.mobile.length !== 10 || isNaN(formData.mobile))) {
       Alert.alert('Error', 'Please enter a valid 10-digit mobile number');
       return false;
     }
@@ -651,24 +608,32 @@ const Profile = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <ProfileHeader />
         <View style={styles.profileImageContainer}>
           <Image
-            source={selectedImage || require('../images/ProfileDp.jpg')}
+            source={
+              selectedImage
+                ? { uri: selectedImage }
+                : require('../images/ProfileDp.jpg')
+            }
             style={styles.profileImage}
           />
           {isEditing && (
-            <TouchableOpacity
-              style={styles.editIconContainer}
-              onPress={() => setShowImagePickerModal(true)}>
-              <Feather
-                name={'edit-3'}
-                size={iconSize.md}
-                color={colors.iconwhite}
-              />
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', marginTop: 10 }}>
+              <TouchableOpacity
+                style={styles.editIconContainer}
+                onPress={openImagePicker}
+              >
+                <Feather name="image" size={iconSize.md} color={colors.iconwhite} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.editIconContainer}
+                onPress={openCamera} 
+              >
+                <Feather name="camera" size={iconSize.md} color={colors.iconwhite} />
+              </TouchableOpacity>
+            </View>
           )}
         </View>
 
@@ -694,34 +659,6 @@ const Profile = () => {
             <Text style={styles.saveButtonText}>Save Changes</Text>
           </TouchableOpacity>
         )}
-
-        {/* Image Picker Modal */}
-        <Modal
-          visible={showImagePickerModal}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => setShowImagePickerModal(false)}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Change Profile Photo</Text>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={() => handleImagePicker('camera')}>
-                <Text style={styles.modalButtonText}>Take Photo</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={() => handleImagePicker('gallery')}>
-                <Text style={styles.modalButtonText}>Choose from Gallery</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setShowImagePickerModal(false)}>
-                <Text style={[styles.modalButtonText, styles.cancelButtonText]}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
       </ScrollView>
     </SafeAreaView>
   );
@@ -747,14 +684,13 @@ const styles = StyleSheet.create({
     borderRadius: 70,
   },
   editIconContainer: {
-    height: 35,
-    width: 35,
+    height: 40,
+    width: 40,
     backgroundColor: colors.orange,
-    borderRadius: 15,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: -30,
-    marginLeft: 45,
+    marginHorizontal: 5,
   },
   headerContainer: {
     flexDirection: 'row',
@@ -779,42 +715,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    paddingBottom: 30,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  modalButton: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  modalButtonText: {
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  cancelButton: {
-    marginTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-    borderBottomWidth: 0,
-  },
-  cancelButtonText: {
-    color: 'red',
   },
 });
 
