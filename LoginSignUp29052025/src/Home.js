@@ -1,4 +1,7 @@
-// import React, {useState, useEffect} from 'react';
+
+
+
+// import React, {useState, useEffect, useMemo, useCallback} from 'react';
 // import {
 //   View,
 //   StyleSheet,
@@ -10,10 +13,11 @@
 //   RefreshControl,
 // } from 'react-native';
 // import Background from './Background';
-// import Btn from './Btn';
 // import {darkGreen} from './Constants';
 // import {useNavigation} from '@react-navigation/native';
-// import Button from './components/Button';
+// import { useDispatch } from 'react-redux';
+// import { addItem } from './redux/cartSlice';
+
 
 // const Home = props => {
 //   const [products, setProducts] = useState([]);
@@ -23,12 +27,9 @@
 //   const {route} = props;
 //   const email = route?.params?.email || '';
 //   const navigation = useNavigation();
+//   const dispatch = useDispatch();
 
-//   useEffect(() => {
-//     fetchProducts();
-//   }, []);
-
-//   const fetchProducts = async () => {
+//   const fetchProducts = useCallback(async () => {
 //     try {
 //       const URL = 'https://fakestoreapi.com/products?limit=20';
 //       let response = await fetch(URL);
@@ -44,33 +45,72 @@
 //       setLoading(false);
 //       setRefreshing(false);
 //     }
-//   };
+//   }, []);
 
-//   const onRefresh = () => {
+//   useEffect(() => {
+//     fetchProducts();
+//   }, [fetchProducts]);
+
+//   const onRefresh = useCallback(() => {
 //     setRefreshing(true);
 //     fetchProducts();
-//   };
+//   }, [fetchProducts]);
 
-//   const handleProductPress = product => {
-//     navigation.navigate('Details', {product});
-//   };
+//   const handleProductPress = useCallback(
+//     product => {
+//       navigation.navigate('Details', {product});
+//     },
+//     [navigation],
+//   );
 
-//   const handleAddToCart = product => {
-//     navigation.navigate('CartStack', {
-//       screen: 'Cart',
-//       params: {product},
-//     });
-//   };
+//   const handleAddToCart = useCallback(
+//     product => {
+//       dispatch(addItem(product));
+//     },
+//     [dispatch],
+//   );
 
-//   const handleBuyNow = product => {
-//     navigation.navigate('CartStack', {
-//       screen: 'Checkout',
-//       params: {
-//         cartItems: [{...product, quantity: 1}],
-//         total: product.price.toFixed(2),
-//       },
-//     });
-//   };
+//   const handleBuyNow = useCallback(
+//     product => {
+//       dispatch(addItem(product));
+//       navigation.navigate('CartStack', {
+//         screen: 'Cart',
+//       });
+//     },
+//     [dispatch, navigation],
+//   );
+
+//   const memoizedProducts = useMemo(() => products, [products]);
+
+//   const renderItem = useCallback(
+//     ({item}) => (
+//       <TouchableOpacity
+//         style={styles.cardContainer}
+//         onPress={() => handleProductPress(item)}>
+//         <Image source={{uri: item.image}} style={styles.image} />
+//         <Text style={styles.title} numberOfLines={2}>
+//           {item.title}
+//         </Text>
+//         <Text style={styles.price}>${item.price}</Text>
+//         <Text style={styles.rating}>
+//           Rating: {item.rating.rate} ({item.rating.count})
+//         </Text>
+//         <View style={styles.buttonContainer}>
+//           <TouchableOpacity
+//             style={[styles.actionButton, {backgroundColor: darkGreen}]}
+//             onPress={() => handleBuyNow(item)}>
+//             <Text style={styles.buttonText}>Buy Now</Text>
+//           </TouchableOpacity>
+//           <TouchableOpacity
+//             style={[styles.actionButton, {backgroundColor: '#FF9900'}]}
+//             onPress={() => handleAddToCart(item)}>
+//             <Text style={styles.buttonText}>Add to Cart</Text>
+//           </TouchableOpacity>
+//         </View>
+//       </TouchableOpacity>
+//     ),
+//     [handleProductPress, handleBuyNow, handleAddToCart],
+//   );
 
 //   if (loading && !refreshing) {
 //     return (
@@ -97,7 +137,8 @@
 //           </View>
 //         ) : (
 //           <FlatList
-//             data={products}
+//             data={memoizedProducts}
+//             renderItem={renderItem}
 //             keyExtractor={item => item.id.toString()}
 //             showsVerticalScrollIndicator={true}
 //             numColumns={2}
@@ -114,48 +155,6 @@
 //                 tintColor="#FF9900"
 //               />
 //             }
-//             renderItem={({item}) => (
-//               <TouchableOpacity
-//                 style={styles.cardContainer}
-//                 onPress={() => handleProductPress(item)}>
-//                 <Image source={{uri: item.image}} style={styles.image} />
-//                 <Text style={styles.title} numberOfLines={2}>
-//                   {item.title}
-//                 </Text>
-//                 <Text style={styles.price}>${item.price}</Text>
-//                 <Text style={styles.rating}>
-//                   Rating: {item.rating.rate} ({item.rating.count})
-//                 </Text>
-//                 {/* <View style={styles.buttonContainer}>
-//                   <TouchableOpacity
-//                     style={[styles.actionButton, {backgroundColor: darkGreen}]}
-//                     onPress={() => handleBuyNow(item)}>
-//                     <Text style={styles.buttonText}>Buy Now</Text>
-//                   </TouchableOpacity>
-//                   <TouchableOpacity
-//                     style={[styles.actionButton, {backgroundColor: '#FF9900'}]}
-//                     onPress={() => handleAddToCart(item)}>
-//                     <Text style={styles.buttonText}>Add to Cart</Text>
-//                   </TouchableOpacity>
-//                 </View> */}
-//                 <View style={styles.buttonContainer}>
-//                   <Button
-//                     title="Buy Now"
-//                     color="green"
-//                     size="small"
-//                     onPress={() => handleBuyNow(item)}
-//                     style={{flex: 1, marginRight: 5}}
-//                   />
-//                   <Button
-//                     title="Add to Cart"
-//                     color="orange"
-//                     size="small"
-//                     onPress={() => handleAddToCart(item)}
-//                     style={{flex: 1, marginLeft: 5}}
-//                   />
-//                 </View>
-//               </TouchableOpacity>
-//             )}
 //             ListFooterComponent={
 //               <View style={styles.footer}>
 //                 <Text style={styles.footerText}>Showing products</Text>
@@ -183,12 +182,6 @@
 //     marginBottom: 15,
 //     fontWeight: 'bold',
 //     textAlign: 'center',
-//   },
-//   buttonsContainer: {
-//     marginBottom: 25,
-//   },
-//   authButton: {
-//     marginVertical: 10,
 //   },
 //   loadingContainer: {
 //     flex: 1,
@@ -295,7 +288,11 @@
 
 // export default Home;
 
-import React, {useState, useEffect, useMemo, useCallback} from 'react';
+
+
+
+
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   View,
   StyleSheet,
@@ -307,9 +304,13 @@ import {
   RefreshControl,
 } from 'react-native';
 import Background from './Background';
-import Btn from './Btn';
-import {darkGreen} from './Constants';
-import {useNavigation} from '@react-navigation/native';
+import { darkGreen } from './Constants';
+import { useNavigation } from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
+import { addItem } from './redux/cartSlice';
+import { addToWishlist, removeFromWishlist } from './redux/wishlistSlice'; // NEW IMPORTS
+import Ionicons from 'react-native-vector-icons/Ionicons'; // NEW IMPORT
+
 
 const Home = props => {
   const [products, setProducts] = useState([]);
@@ -319,6 +320,26 @@ const Home = props => {
   const {route} = props;
   const email = route?.params?.email || '';
   const navigation = useNavigation();
+const wishlistItems = useSelector(state => state.wishlist); // NEW
+  const dispatch = useDispatch();
+  const isInWishlist = useCallback(
+    productId => {
+      return wishlistItems.some(item => item.id === productId);
+    },
+    [wishlistItems]
+  );
+
+  const handleWishlistPress = useCallback(
+    product => {
+      if (isInWishlist(product.id)) {
+        dispatch(removeFromWishlist(product.id));
+      } else {
+        dispatch(addToWishlist(product));
+      }
+    },
+    [dispatch, isInWishlist]
+  );
+  
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -356,35 +377,40 @@ const Home = props => {
 
   const handleAddToCart = useCallback(
     product => {
-      navigation.navigate('CartStack', {
-        screen: 'Cart',
-        params: {product},
-      });
+      dispatch(addItem(product));
     },
-    [navigation],
+    [dispatch],
   );
 
   const handleBuyNow = useCallback(
     product => {
+      dispatch(addItem(product));
       navigation.navigate('CartStack', {
-        screen: 'Checkout',
-        params: {
-          cartItems: [{...product, quantity: 1}],
-          total: product.price.toFixed(2),
-        },
+        screen: 'Cart',
       });
     },
-    [navigation],
+    [dispatch, navigation],
   );
 
   const memoizedProducts = useMemo(() => products, [products]);
 
-  const renderItem = useCallback(
-    ({item}) => (
+ const renderItem = useCallback(
+    ({ item }) => (
       <TouchableOpacity
         style={styles.cardContainer}
         onPress={() => handleProductPress(item)}>
-        <Image source={{uri: item.image}} style={styles.image} />
+        <View style={styles.wishlistContainer}> {/* NEW CONTAINER */}
+          <TouchableOpacity
+            onPress={() => handleWishlistPress(item)}
+            style={styles.wishlistButton}>
+            <Ionicons
+              name={isInWishlist(item.id) ? 'heart' : 'heart-outline'}
+              size={24}
+              color={isInWishlist(item.id) ? 'red' : 'black'}
+            />
+          </TouchableOpacity>
+        </View>
+        <Image source={{ uri: item.image }} style={styles.image} />
         <Text style={styles.title} numberOfLines={2}>
           {item.title}
         </Text>
@@ -394,19 +420,19 @@ const Home = props => {
         </Text>
         <View style={styles.buttonContainer}>
           <TouchableOpacity
-            style={[styles.actionButton, {backgroundColor: darkGreen}]}
+            style={[styles.actionButton, { backgroundColor: darkGreen }]}
             onPress={() => handleBuyNow(item)}>
             <Text style={styles.buttonText}>Buy Now</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.actionButton, {backgroundColor: '#FF9900'}]}
+            style={[styles.actionButton, { backgroundColor: '#FF9900' }]}
             onPress={() => handleAddToCart(item)}>
             <Text style={styles.buttonText}>Add to Cart</Text>
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
     ),
-    [handleProductPress, handleBuyNow, handleAddToCart],
+    [handleProductPress, handleBuyNow, handleAddToCart, handleWishlistPress, isInWishlist]
   );
 
   if (loading && !refreshing) {
@@ -581,6 +607,19 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 14,
   },
+wishlistContainer: { // NEW STYLE
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1,
+  },
+  wishlistButton: { // NEW STYLE
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    borderRadius: 20,
+    padding: 5,
+  },
+
+
 });
 
 export default Home;
