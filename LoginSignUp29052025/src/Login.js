@@ -14,6 +14,8 @@ import {
 import Btn from './Btn';
 
 import {useNavigation} from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser, validateOtp } from './redux/authSlice';
 
 const Login = props => {
   const [email, setEmail] = useState('');
@@ -21,6 +23,14 @@ const Login = props => {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  const registeredUsers = useSelector(state => state.auth.registeredUsers);
+  const loginStatus = useSelector(state => state.auth.loginStatus);
+  const loginError = useSelector(state => state.auth.loginError);
+  const loginId = useSelector(state => state.auth.loginId);
+  const otpStatus = useSelector(state => state.auth.otpStatus);
+  const otpError = useSelector(state => state.auth.otpError);
+  const [otp, setOtp] = useState('');
 
   const validateForm = () => {
     let isValid = true;
@@ -49,18 +59,23 @@ const Login = props => {
 
   const handleLogin = async () => {
     if (!validateForm()) return;
-
-    setIsLoading(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      Alert.alert('Success', 'Logged in successfully!');
-
-      navigation.navigate('Home', {email: email});
-    } catch (error) {
-      Alert.alert('Error', 'Failed to login. Please try again.');
-    } finally {
+    // Only allow login for registered users
+    const user = registeredUsers.find(u => u.email === email && u.password === password);
+    if (!user) {
       setIsLoading(false);
+      Alert.alert('Error', 'You must register first.');
+      return;
     }
+    setIsLoading(true);
+    dispatch(loginUser({ email, password }));
+  };
+
+  const handleOtpSubmit = () => {
+    if (!otp) {
+      Alert.alert('Error', 'Please enter OTP');
+      return;
+    }
+    dispatch(validateOtp({ id: loginId, otp }));
   };
 
   const handleRegister = () => {
@@ -77,69 +92,88 @@ const Login = props => {
       <View style={styles.innerContainer}>
         <Text style={styles.title}>Welcome Back</Text>
         <Text style={styles.subtitle}>Sign in to continue</Text>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={[styles.input, emailError ? styles.inputError : null]}
-            value={email}
-            onChangeText={text => {
-              setEmail(text);
-              setEmailError('');
-            }}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            placeholder="Enter your email"
-            placeholderTextColor="#999"
-          />
-          {emailError ? (
-            <Text style={styles.errorText}>{emailError}</Text>
-          ) : null}
-        </View>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={[styles.input, passwordError ? styles.inputError : null]}
-            value={password}
-            onChangeText={text => {
-              setPassword(text);
-              setPasswordError('');
-            }}
-            secureTextEntry={true}
-            placeholder="Enter your password"
-            placeholderTextColor="#999"
-          />
-          {passwordError ? (
-            <Text style={styles.errorText}>{passwordError}</Text>
-          ) : null}
-        </View>
-
-        <TouchableOpacity
-          onPress={handleLogin}
-          style={styles.loginButton}
-          disabled={isLoading}>
-          {isLoading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Sign In</Text>
-          )}
-        </TouchableOpacity>
-
+        {/* Show OTP input if login succeeded and OTP not yet validated */}
+        {loginStatus === 'succeeded' && otpStatus !== 'succeeded' ? (
+          <>
+            <Text style={{ marginVertical: 10 }}>Enter OTP sent to your email</Text>
+            <TextInput
+              style={[styles.input]}
+              value={otp}
+              onChangeText={setOtp}
+              placeholder="Enter OTP"
+              keyboardType="numeric"
+            />
+            {otpError ? <Text style={styles.errorText}>{otpError}</Text> : null}
+            <TouchableOpacity
+              onPress={handleOtpSubmit}
+              style={styles.loginButton}
+              disabled={otpStatus === 'loading'}>
+              {otpStatus === 'loading' ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Validate OTP</Text>
+              )}
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Email</Text>
+              <TextInput
+                style={[styles.input, emailError ? styles.inputError : null]}
+                value={email}
+                onChangeText={text => {
+                  setEmail(text);
+                  setEmailError('');
+                }}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                placeholder="Enter your email"
+                placeholderTextColor="#999"
+              />
+              {emailError ? (
+                <Text style={styles.errorText}>{emailError}</Text>
+              ) : null}
+            </View>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Password</Text>
+              <TextInput
+                style={[styles.input, passwordError ? styles.inputError : null]}
+                value={password}
+                onChangeText={text => {
+                  setPassword(text);
+                  setPasswordError('');
+                }}
+                secureTextEntry={true}
+                placeholder="Enter your password"
+                placeholderTextColor="#999"
+              />
+              {passwordError ? (
+                <Text style={styles.errorText}>{passwordError}</Text>
+              ) : null}
+            </View>
+            {loginError ? <Text style={styles.errorText}>{loginError}</Text> : null}
+            <TouchableOpacity
+              onPress={handleLogin}
+              style={styles.loginButton}
+              disabled={isLoading || loginStatus === 'loading'}>
+              {(isLoading || loginStatus === 'loading') ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Sign In</Text>
+              )}
+            </TouchableOpacity>
+          </>
+        )}
         <TouchableOpacity
           onPress={handleForgotPassword}
           style={styles.forgotPasswordButton}>
           <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
-
         <View style={styles.signUpContainer}>
           <Text style={styles.signUpText}>Don't have an account?</Text>
-          <TouchableOpacity onPress={handleRegister}>
-            {/* <Text style={styles.signUpLink}>Sign Up</Text>
-              <Btn bgColor='white' style={styles.signUpLink} btnLabel="SignUp" Press={()=>props.navigation.navigate("SignUp")} /> */}
-            <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-              <Text style={styles.signUpLink}>Sign Up</Text>
-            </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+            <Text style={styles.signUpLink}>Sign Up</Text>
           </TouchableOpacity>
         </View>
       </View>

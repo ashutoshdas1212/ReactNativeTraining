@@ -3,6 +3,9 @@ import {
   View, Text, TextInput, TouchableOpacity, Modal,
   StyleSheet, Alert, ScrollView, SafeAreaView
 } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { registerUser } from './redux/authSlice';
+import { useNavigation } from '@react-navigation/native';
  
 const SignUp = () => {
   
@@ -21,6 +24,10 @@ const SignUp = () => {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [mobileError, setMobileError] = useState('');
+ 
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const registeredUsers = useSelector(state => state.auth.registeredUsers);
  
   const validateForm = () => {
     let isValid = true;
@@ -93,7 +100,16 @@ const SignUp = () => {
  
   const handleRegister = () => {
     if (validateForm()) {
-      Alert.alert('Success', 'Registration Successful');
+      // Check if user already exists
+      const exists = registeredUsers.some(u => u.email === email);
+      if (exists) {
+        Alert.alert('Error', 'User already registered with this email');
+        return;
+      }
+      dispatch(registerUser({ firstName, lastName, gender, email, password, mobile }));
+      Alert.alert('Success', 'Registration Successful', [
+        { text: 'OK', onPress: () => navigation.navigate('Login') }
+      ]);
     }
   };
  

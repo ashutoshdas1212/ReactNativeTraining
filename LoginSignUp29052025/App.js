@@ -17,10 +17,14 @@ import CheckoutScreen from './src/CheckoutScreen';
 import WishlistScreen from './src/wishlist/WishlistScreen';
 import {Provider} from 'react-redux';
 import {store} from './src/redux/store';
+import SignUp from './src/SignUp';
+import Login from './src/Login';
+import { useSelector } from 'react-redux';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
+const AuthStack = createNativeStackNavigator();
 
 function CustomDrawerContent(props) {
   return (
@@ -169,6 +173,15 @@ const HelpScreen = () => (
   </View>
 );
 
+function AuthStackNavigator() {
+  return (
+    <AuthStack.Navigator initialRouteName="SignUp" screenOptions={{ headerShown: false }}>
+      <AuthStack.Screen name="SignUp" component={SignUp} />
+      <AuthStack.Screen name="Login" component={Login} />
+    </AuthStack.Navigator>
+  );
+}
+
 function MainDrawerNavigator() {
   return (
     <Drawer.Navigator
@@ -256,11 +269,24 @@ function MainDrawerNavigator() {
 }
 
 export default function App() {
+  const auth = require('react-redux').useSelector ? require('react-redux').useSelector(state => state.auth) : null;
+  // fallback for hooks in function body
+  let isAuthenticated = false;
+  let otpStatus = 'idle';
+  try {
+    const { currentUser, otpStatus: otp } = useSelector(state => state.auth);
+    isAuthenticated = !!currentUser;
+    otpStatus = otp;
+  } catch (e) {}
   return (
     <Provider store={store}>
       <View style={styles.container}>
         <NavigationContainer>
-          <MainDrawerNavigator />
+          {isAuthenticated && otpStatus === 'succeeded' ? (
+            <MainDrawerNavigator />
+          ) : (
+            <AuthStackNavigator />
+          )}
         </NavigationContainer>
       </View>
     </Provider>
