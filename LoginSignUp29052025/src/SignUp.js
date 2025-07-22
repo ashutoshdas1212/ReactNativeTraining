@@ -3,8 +3,13 @@ import {
   View, Text, TextInput, TouchableOpacity, Modal,
   StyleSheet, Alert, ScrollView, SafeAreaView
 } from 'react-native';
+import {useDispatch} from 'react-redux';
+import {setSignupData} from './auth/authSlice';
+import {useNavigation} from '@react-navigation/native';
  
 const SignUp = () => {
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
   
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -89,11 +94,30 @@ const SignUp = () => {
     return isValid;
   };
 
-
- 
   const handleRegister = () => {
     if (validateForm()) {
-      Alert.alert('Success', 'Registration Successful');
+      const userData = {
+        firstName,
+        lastName,
+        gender,
+        email,
+        password,
+        mobile,
+      };
+      
+      // Store signup data in Redux (for potential future use)
+      dispatch(setSignupData(userData));
+      
+      Alert.alert(
+        'Success', 
+        'Registration Successful! Please login with your credentials.',
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.navigate('Login')
+          }
+        ]
+      );
     }
   };
  
@@ -146,9 +170,8 @@ const SignUp = () => {
   );
  
   return (
-
-    <SafeAreaView>
-      <ScrollView contentContainerStyle={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.heading}>Registration Form</Text>
  
         <View style={styles.inputGroup}>
@@ -243,19 +266,28 @@ const SignUp = () => {
         <TouchableOpacity onPress={handleRegister} style={styles.registerButton}>
           <Text style={styles.registerText}>Register</Text>
         </TouchableOpacity>
+
+        <View style={styles.loginContainer}>
+          <Text style={styles.loginText}>Already have an account?</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.loginLink}>Login</Text>
+          </TouchableOpacity>
+        </View>
         
       </ScrollView>
     </SafeAreaView>
- 
   );
 };
  
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    flex: 1,
     backgroundColor: '#fff',
+  },
+  scrollContainer: {
+    padding: 20,
     flexGrow: 1,
-    marginTop: 70
+    paddingTop: 50,
   },
   heading: {
     fontSize: 24,
@@ -350,13 +382,28 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
-    marginTop: 50  
+    marginTop: 30,
+    marginBottom: 20,
   },
   registerText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold'
-  }
+  },
+  loginContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 10,
+    marginBottom: 30,
+  },
+  loginText: {
+    color: '#666',
+    marginRight: 4,
+  },
+  loginLink: {
+    color: '#007bff',
+    fontWeight: 'bold',
+  },
 });
  
 export default SignUp;

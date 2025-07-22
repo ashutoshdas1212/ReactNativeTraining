@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -7,20 +7,43 @@ import {
   StyleSheet,
   Alert,
   SafeAreaView,
-  Platform,
   ActivityIndicator,
-  KeyboardAvoidingView,
 } from 'react-native';
-import Btn from './Btn';
-
+import {useDispatch, useSelector} from 'react-redux';
+import {loginUser, clearError} from './auth/authSlice';
 import {useNavigation} from '@react-navigation/native';
 
-const Login = props => {
+const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const {isLoading, error, isOtpRequired, isAuthenticated} = useSelector(state => state.auth);
+
+  useEffect(() => {
+    if (isOtpRequired) {
+      navigation.navigate('OtpVerification');
+    }
+  }, [isOtpRequired, navigation]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'MainApp'}],
+      });
+    }
+  }, [isAuthenticated, navigation]);
+
+  useEffect(() => {
+    if (error) {
+      Alert.alert('Error', error);
+      dispatch(clearError());
+    }
+  }, [error, dispatch]);
 
   const validateForm = () => {
     let isValid = true;
@@ -47,30 +70,15 @@ const Login = props => {
     return isValid;
   };
 
-  const handleLogin = async () => {
+  const handleLogin = () => {
     if (!validateForm()) return;
 
-    setIsLoading(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      Alert.alert('Success', 'Logged in successfully!');
-
-      navigation.navigate('Home', {email: email});
-    } catch (error) {
-      Alert.alert('Error', 'Failed to login. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleRegister = () => {
-    Alert.alert('Register', 'Registration would be handled here');
+    dispatch(loginUser({email, password}));
   };
 
   const handleForgotPassword = () => {
     Alert.alert('Forgot Password', 'Password reset would be handled here');
   };
-  const navigation = useNavigation();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -134,12 +142,8 @@ const Login = props => {
 
         <View style={styles.signUpContainer}>
           <Text style={styles.signUpText}>Don't have an account?</Text>
-          <TouchableOpacity onPress={handleRegister}>
-            {/* <Text style={styles.signUpLink}>Sign Up</Text>
-              <Btn bgColor='white' style={styles.signUpLink} btnLabel="SignUp" Press={()=>props.navigation.navigate("SignUp")} /> */}
-            <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-              <Text style={styles.signUpLink}>Sign Up</Text>
-            </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+            <Text style={styles.signUpLink}>Sign Up</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -151,9 +155,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  keyboardAvoidingView: {
-    flex: 1,
   },
   innerContainer: {
     flex: 1,

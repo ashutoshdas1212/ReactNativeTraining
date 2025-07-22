@@ -15,12 +15,16 @@ import Details from './src/Details';
 import CartScreen from './src/cart/CartScreen';
 import CheckoutScreen from './src/CheckoutScreen';
 import WishlistScreen from './src/wishlist/WishlistScreen';
-import {Provider} from 'react-redux';
+import Login from './src/Login';
+import SignUp from './src/SignUp';
+import OtpVerification from './src/OtpVerification';
+import {Provider, useSelector} from 'react-redux';
 import {store} from './src/redux/store';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
+const AuthStack = createNativeStackNavigator();
 
 function CustomDrawerContent(props) {
   return (
@@ -255,12 +259,42 @@ function MainDrawerNavigator() {
   );
 }
 
+// Authentication Stack Navigator
+function AuthNavigator() {
+  return (
+    <AuthStack.Navigator 
+      initialRouteName="SignUp"
+      screenOptions={{
+        headerShown: false,
+      }}>
+      <AuthStack.Screen name="SignUp" component={SignUp} />
+      <AuthStack.Screen name="Login" component={Login} />
+      <AuthStack.Screen name="OtpVerification" component={OtpVerification} />
+    </AuthStack.Navigator>
+  );
+}
+
+// Main App Navigator
+function AppNavigator() {
+  const {isAuthenticated} = useSelector(state => state.auth);
+
+  return (
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      {isAuthenticated ? (
+        <Stack.Screen name="MainApp" component={MainDrawerNavigator} />
+      ) : (
+        <Stack.Screen name="Auth" component={AuthNavigator} />
+      )}
+    </Stack.Navigator>
+  );
+}
+
 export default function App() {
   return (
     <Provider store={store}>
       <View style={styles.container}>
         <NavigationContainer>
-          <MainDrawerNavigator />
+          <AppNavigator />
         </NavigationContainer>
       </View>
     </Provider>

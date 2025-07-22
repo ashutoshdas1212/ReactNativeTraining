@@ -16,6 +16,8 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
+import {useDispatch, useSelector} from 'react-redux';
+import {logout} from './auth/authSlice';
 import CustomInput from './components/CustomInput';
 import ProfileHeader from './components/ProfileHeader';
 import { fontSize, iconSize, spacing } from '../constants/dimensions';
@@ -24,19 +26,38 @@ import { colors } from './Constants';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 const Profile = () => {
+  const dispatch = useDispatch();
+  const {user} = useSelector(state => state.auth);
+  
   const [selectedImage, setSelectedImage] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [imagePickerVisible, setImagePickerVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: 'Samazon',
-    lastName: 'User',
-    gender: 'Male',
-    email: 'samazon@example.com',
+    firstName: user?.firstName || 'Samazon',
+    lastName: user?.lastName || 'User',
+    gender: user?.gender || 'Male',
+    email: user?.email || 'samazon@example.com',
     password: 'password123!',
-    mobile: '9876543210',
+    mobile: user?.mobile || '9876543210',
   });
 
+  const handleLogout = useCallback(() => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: () => {
+            dispatch(logout());
+          }
+        }
+      ]
+    );
+  }, [dispatch]);
 
   const requestAndroidPermission = async (permissionType) => {
     try {
@@ -252,6 +273,12 @@ const Profile = () => {
           </TouchableOpacity>
         )}
 
+        {/* Logout Button */}
+        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+          <Ionicons name="log-out-outline" size={24} color="#fff" />
+          <Text style={styles.logoutButtonText}>Logout</Text>
+        </TouchableOpacity>
+
  
         <Modal
           visible={imagePickerVisible}
@@ -346,6 +373,22 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  logoutButton: {
+    backgroundColor: '#ff4757',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+    marginHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  logoutButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 8,
   },
   loadingContainer: {
     height: 140,
