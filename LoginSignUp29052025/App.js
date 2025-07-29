@@ -17,6 +17,7 @@ import CheckoutScreen from './src/CheckoutScreen';
 import WishlistScreen from './src/wishlist/WishlistScreen';
 import {Provider} from 'react-redux';
 import {store} from './src/redux/store';
+import Login from './src/Login';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -258,11 +259,18 @@ function MainDrawerNavigator() {
 export default function App() {
   return (
     <Provider store={store}>
-      <View style={styles.container}>
-        <NavigationContainer>
-          <MainDrawerNavigator />
-        </NavigationContainer>
-      </View>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName="Login"
+          screenOptions={{headerShown: false}}>
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen
+            name="OTPValidationScreen"
+            component={require('./src/screens/OTPValidationScreen').default}
+          />
+          <Stack.Screen name="MainDrawer" component={MainDrawerNavigator} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </Provider>
   );
 }

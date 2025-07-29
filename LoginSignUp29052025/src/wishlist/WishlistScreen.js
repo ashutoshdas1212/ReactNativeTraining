@@ -29,96 +29,159 @@ const PRICE_DARK = '#003580';
 const ICON_GRAY = '#B0B0B0';
 
 const WishlistScreen = () => {
-  const wishlistItems = useSelector(state => state.wishlist);
+  // Redux and navigation hooks
   const cartItems = useSelector(state => state.cart);
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  // Local state for wishlist, loading, error, and quantities
+  const [wishlist, setWishlist] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [quantities, setQuantities] = useState({});
+  // Get JWT token from Redux
+  const token = useSelector(state => state.auth.token);
 
-  // Initialize quantities for all wishlist items only once or when wishlistItems change
+  // Fetch wishlist from backend when token is available
+  useEffect(() => {
+    if (!token) return;
+    setLoading(true);
+    setError(null);
+    fetch('https://adminbackend.azurewebsites.net/mobile/1.1.1/wishlist', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status && Array.isArray(data.data)) {
+          setWishlist(data.data);
+        } else {
+          setError(data.message || 'Failed to fetch wishlist');
+        }
+      })
+      .catch(err => setError(err.message || 'Network error'))
+      .finally(() => setLoading(false));
+  }, [token]);
+
+  // Reset quantities when wishlist changes
   useEffect(() => {
     const initialQuantities = {};
-    wishlistItems.forEach(item => {
-      if (quantities[item.id] === undefined) {
-        initialQuantities[item.id] = '1';
+    wishlist.forEach(item => {
+      if (quantities[item.wishlistId] === undefined) {
+        initialQuantities[item.wishlistId] = '1';
       }
     });
     if (Object.keys(initialQuantities).length > 0) {
       setQuantities(prev => ({...prev, ...initialQuantities}));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wishlistItems]);
+  }, [wishlist, quantities]);
 
+  // Handle quantity input change
   const handleQuantityChange = (id, value) => {
     if (/^\d*$/.test(value)) {
       setQuantities(prev => ({...prev, [id]: value}));
     }
   };
 
-  const renderItem = useCallback(
-    ({item}) => {
-      // Removed setQuantities from here to avoid setState in render
-      return (
-        <View style={styles.card}>
-          <Image source={{uri: item.image}} style={styles.productImage} />
-          <View style={styles.infoContainer}>
-            <View style={styles.row}>
-              <Text style={styles.partNoLabel}>Part No. :</Text>
-              <Text style={styles.partNo}>{item.id}</Text>
-              <TouchableOpacity
-                onPress={() => dispatch(removeFromWishlist(item.id))}
-                style={styles.heartBtn}>
-                <Ionicons name="heart" size={28} color={DARK_BLUE} />
-              </TouchableOpacity>
-            </View>
-            <Text style={styles.desc} numberOfLines={2}>
-              {item.title}
-            </Text>
-            <View style={styles.priceRow}>
-              <Text style={styles.priceLabel}>Price :</Text>
-              <Text style={styles.priceValue}>${item.price}</Text>
-            </View>
-            <View style={styles.quantityRow}>
-              <Text style={styles.quantityLabel}>Quantity :</Text>
-              <TextInput
-                style={styles.quantityInput}
-                value={
-                  quantities[item.id] !== undefined ? quantities[item.id] : '1'
-                }
-                onChangeText={value => handleQuantityChange(item.id, value)}
-                keyboardType="number-pad"
-                maxLength={3}
-                placeholder="1"
-                placeholderTextColor={DARK_BLUE}
-              />
-            </View>
-            <TouchableOpacity
-              style={styles.addToCartBtn}
-              onPress={() => {
-                const quantity = parseInt(quantities[item.id], 10) || 1;
-                dispatch(addItem({...item, quantity}));
-              }}>
-              <Text style={styles.addToCartText}>Add To Cart</Text>
-            </TouchableOpacity>
+  // Render a single spare part card
+  const renderSparePart = useCallback(
+    ({item, wishlistId}) => (
+      <View style={styles.card} key={item.BSUSNumber}>
+        <Image source={{uri: item.spImageUrl}} style={styles.productImage} />
+        <View style={styles.infoContainer}>
+          <View style={styles.row}>
+            <Text style={styles.partNoLabel}>Part No. :</Text>
+            <Text style={styles.partNo}>{item.partNumber}</Text>
           </View>
+          <Text style={styles.desc} numberOfLines={2}>
+            {item.description}
+          </Text>
+          <View style={styles.priceRow}>
+            <Text style={styles.priceLabel}>Price :</Text>
+            <Text style={styles.priceValue}>${item.salesPrice}</Text>
+          </View>
+          <View style={styles.quantityRow}>
+            <Text style={styles.quantityLabel}>Quantity :</Text>
+            <TextInput
+              style={styles.quantityInput}
+              value={
+                quantities[wishlistId] !== undefined
+                  ? quantities[wishlistId]
+                  : '1'
+              }
+              onChangeText={value => handleQuantityChange(wishlistId, value)}
+              keyboardType="number-pad"
+              maxLength={3}
+              placeholder="1"
+              placeholderTextColor={DARK_BLUE}
+            />
+          </View>
+          <TouchableOpacity
+            style={styles.addToCartBtn}
+            onPress={() => {
+              const quantity = parseInt(quantities[wishlistId], 10) || 1;
+              dispatch(addItem({...item, quantity}));
+            }}>
+            <Text style={styles.addToCartText}>Add To Cart</Text>
+          </TouchableOpacity>
         </View>
-      );
-    },
+      </View>
+    ),
     [dispatch, quantities],
   );
 
-  
+  // Render a wishlist section with its spare parts
+  const renderWishlist = useCallback(
+    ({item}) => (
+      <View key={item.wishlistId} style={{marginBottom: 24}}>
+        <Text style={styles.wishlistHeader}>{item.wishlistName}</Text>
+        {item.spareParts && item.spareParts.length > 0 ? (
+          item.spareParts.map(sparePart => (
+            <View key={sparePart.BSUSNumber} style={styles.sparePartWrapper}>
+              {renderSparePart({item: sparePart, wishlistId: item.wishlistId})}
+            </View>
+          ))
+        ) : (
+          <Text style={styles.emptyText}>No spare parts in this wishlist.</Text>
+        )}
+        <View style={styles.divider} />
+      </View>
+    ),
+    [renderSparePart],
+  );
 
+  // Show loading or error states
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <Text style={{textAlign: 'center', marginTop: 40}}>
+          Loading wishlist...
+        </Text>
+      </SafeAreaView>
+    );
+  }
+  if (error) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <Text style={{color: 'red', textAlign: 'center', marginTop: 40}}>
+          {error}
+        </Text>
+      </SafeAreaView>
+    );
+  }
+
+  // Main render: wishlist list
   return (
     <SafeAreaView style={styles.safeArea}>
       <FlatList
-        data={wishlistItems}
-        renderItem={renderItem}
-        keyExtractor={item => item.id.toString()}
+        data={wishlist}
+        renderItem={renderWishlist}
+        keyExtractor={item => item.wishlistId.toString()}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
-     
     </SafeAreaView>
   );
 };
@@ -219,7 +282,7 @@ const styles = StyleSheet.create({
   quantityLabel: {
     fontFamily: fontFamily.medium,
     fontSize: 16,
-    color: '#2563a6', // medium blue between light and dark
+    color: '#2563a6',
     marginRight: 8,
     fontWeight: '400',
     letterSpacing: 0.1,
@@ -347,6 +410,29 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: 'bold',
+  },
+  // --- New styles for better organization ---
+  wishlistHeader: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 16,
+    marginTop: 16,
+    color: DARK_BLUE,
+    marginBottom: 8,
+  },
+  sparePartWrapper: {
+    marginBottom: 12,
+  },
+  emptyText: {
+    marginLeft: 16,
+    color: GRAY,
+    marginBottom: 8,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#e0e0e0',
+    marginHorizontal: 10,
+    marginTop: 16,
   },
 });
 

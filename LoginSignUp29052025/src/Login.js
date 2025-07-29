@@ -7,77 +7,63 @@ import {
   StyleSheet,
   Alert,
   SafeAreaView,
-  Platform,
   ActivityIndicator,
-  KeyboardAvoidingView,
 } from 'react-native';
-import Btn from './Btn';
-
 import {useNavigation} from '@react-navigation/native';
+import {useDispatch, useSelector} from 'react-redux';
+import {loginUser} from './redux/authSlice';
 
-const Login = props => {
+const Login = () => {
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const {loading, error, id} = useSelector(state => state.auth);
+
 
   const validateForm = () => {
-    let isValid = true;
-
+    let valid = true;
     setEmailError('');
     setPasswordError('');
-
     if (!email) {
       setEmailError('Email is required');
-      isValid = false;
+      valid = false;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setEmailError('Please enter a valid email');
-      isValid = false;
+      valid = false;
     }
-
     if (!password) {
       setPasswordError('Password is required');
-      isValid = false;
+      valid = false;
     } else if (password.length < 6) {
       setPasswordError('Password must be at least 6 characters');
-      isValid = false;
+      valid = false;
     }
-
-    return isValid;
+    return valid;
   };
+
 
   const handleLogin = async () => {
     if (!validateForm()) return;
-
-    setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      Alert.alert('Success', 'Logged in successfully!');
-
-      navigation.navigate('Home', {email: email});
-    } catch (error) {
-      Alert.alert('Error', 'Failed to login. Please try again.');
-    } finally {
-      setIsLoading(false);
+      const result = await dispatch(loginUser({email, password}));
+      if (loginUser.fulfilled.match(result)) {
+        navigation.navigate('OTPValidationScreen');
+      }
+    
+    } catch (e) {
+      
     }
   };
-
-  const handleRegister = () => {
-    Alert.alert('Register', 'Registration would be handled here');
-  };
-
-  const handleForgotPassword = () => {
-    Alert.alert('Forgot Password', 'Password reset would be handled here');
-  };
-  const navigation = useNavigation();
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.innerContainer}>
         <Text style={styles.title}>Welcome Back</Text>
         <Text style={styles.subtitle}>Sign in to continue</Text>
-
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Email</Text>
           <TextInput
@@ -96,7 +82,6 @@ const Login = props => {
             <Text style={styles.errorText}>{emailError}</Text>
           ) : null}
         </View>
-
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Password</Text>
           <TextInput
@@ -114,34 +99,22 @@ const Login = props => {
             <Text style={styles.errorText}>{passwordError}</Text>
           ) : null}
         </View>
-
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
         <TouchableOpacity
           onPress={handleLogin}
           style={styles.loginButton}
-          disabled={isLoading}>
-          {isLoading ? (
+          disabled={loading}>
+          {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
             <Text style={styles.buttonText}>Sign In</Text>
           )}
         </TouchableOpacity>
-
         <TouchableOpacity
-          onPress={handleForgotPassword}
+          onPress={() => navigation.navigate('SignUp')}
           style={styles.forgotPasswordButton}>
-          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+          <Text style={styles.forgotPasswordText}>Sign Up</Text>
         </TouchableOpacity>
-
-        <View style={styles.signUpContainer}>
-          <Text style={styles.signUpText}>Don't have an account?</Text>
-          <TouchableOpacity onPress={handleRegister}>
-            {/* <Text style={styles.signUpLink}>Sign Up</Text>
-              <Btn bgColor='white' style={styles.signUpLink} btnLabel="SignUp" Press={()=>props.navigation.navigate("SignUp")} /> */}
-            <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-              <Text style={styles.signUpLink}>Sign Up</Text>
-            </TouchableOpacity>
-          </TouchableOpacity>
-        </View>
       </View>
     </SafeAreaView>
   );
@@ -151,9 +124,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  keyboardAvoidingView: {
-    flex: 1,
   },
   innerContainer: {
     flex: 1,
@@ -217,19 +187,6 @@ const styles = StyleSheet.create({
   forgotPasswordText: {
     color: '#007bff',
     fontSize: 14,
-  },
-  signUpContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 24,
-  },
-  signUpText: {
-    color: '#666',
-    marginRight: 4,
-  },
-  signUpLink: {
-    color: '#007bff',
-    fontWeight: 'bold',
   },
 });
 

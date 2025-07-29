@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
 
 const wishlistSlice = createSlice({
   name: 'wishlist',
@@ -13,9 +13,10 @@ const wishlistSlice = createSlice({
     removeFromWishlist: (state, action) => {
       return state.filter(item => item.id !== action.payload);
     },
-    clearWishlist: () => []
-  }
+    clearWishlist: () => [],
+  },
 });
 
-export const { addToWishlist, removeFromWishlist, clearWishlist } = wishlistSlice.actions;
+export const {addToWishlist, removeFromWishlist, clearWishlist} =
+  wishlistSlice.actions;
 export default wishlistSlice.reducer;
